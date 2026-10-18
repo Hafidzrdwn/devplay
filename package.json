@@ -7,7 +7,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "serve .vercel/output/static",
-    "check": "astro check"
+    "check": "astro check",
+    "check:comments": "node scripts/check-comments.mjs",
+    "check:all": "astro check && pnpm check:comments"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.14",
