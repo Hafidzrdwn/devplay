@@ -37,7 +37,7 @@ const difficultyDotColors: Record<Difficulty, string> = {
 };
 ---
 
-<nav aria-label={t('nav.docs')} class:list={['space-y-3', className]}>
+<nav aria-label={t('nav.docs')} class:list={['space-y-3', className]} data-pagefind-ignore>
   {
     categories.map((cat) => {
       const categoryConcepts = officialConcepts.filter(

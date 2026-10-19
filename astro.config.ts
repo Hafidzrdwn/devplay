@@ -3,12 +3,13 @@ import react from '@astrojs/react';
 import mdx from '@astrojs/mdx';
 import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
+import pagefind from 'astro-pagefind';
 
 export default defineConfig({
   site: 'https://devplay.vercel.app',
   output: 'static',
   adapter: vercel(),
-  integrations: [react(), mdx()],
+  integrations: [react(), mdx(), pagefind()],
   prefetch: {
     prefetchAll: false,
     defaultStrategy: 'tap',

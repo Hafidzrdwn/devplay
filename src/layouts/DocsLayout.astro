@@ -5,7 +5,7 @@ import { SidebarDrawer } from '@/components/layout/SidebarDrawer';
 import { Toc, type TocHeading } from '@/components/layout/Toc';
 import PrevNext from '@/components/layout/PrevNext.astro';
 import type { Lang } from '@/i18n/config';
-import type { CategoryId } from '@/types/content';
+import type { CategoryId, Difficulty, VisualizationKind } from '@/types/content';
 import type { MarkdownHeading } from 'astro';
 
 interface Props {
@@ -15,9 +15,22 @@ interface Props {
   category: CategoryId;
   slug: string;
   headings?: MarkdownHeading[];
+  difficulty?: Difficulty;
+  visualization?: VisualizationKind;
+  keywords?: string[];
 }
 
-const { title, description, lang, category, slug, headings = [] } = Astro.props;
+const {
+  title,
+  description,
+  lang,
+  category,
+  slug,
+  headings = [],
+  difficulty,
+  visualization,
+  keywords = [],
+} = Astro.props;
 
 const tocHeadings: TocHeading[] = headings
   .filter((h): h is MarkdownHeading & { depth: 2 | 3 } => h.depth === 2 || h.depth === 3)
@@ -49,9 +62,15 @@ const tocHeadings: TocHeading[] = headings
       </aside>
 
       <main class="w-full max-w-[75ch] mx-auto min-w-0" data-pagefind-body>
+        <meta data-pagefind-filter="category[content]" content={category} />
+        {difficulty && <meta data-pagefind-filter="difficulty[content]" content={difficulty} />}
+        {visualization && <meta data-pagefind-filter="visualization[content]" content={visualization} />}
         <h1 class="font-heading text-3xl sm:text-4xl font-bold mb-6 text-ink" data-pagefind-meta="title">
           {title}
         </h1>
+        {keywords.length > 0 && (
+          <span hidden data-pagefind-weight="8">{keywords.join(' ')}</span>
+        )}
         <article class="prose max-w-none text-ink">
           <slot />
         </article>

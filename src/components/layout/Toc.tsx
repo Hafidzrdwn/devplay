@@ -69,6 +69,7 @@ export function Toc({ headings, lang }: TocProps): React.JSX.Element | null {
   return (
     <nav
       aria-label={t('toc.title')}
+      data-pagefind-ignore
       className="space-y-2 rounded-card border-2 border-ink bg-surface p-4 shadow-hard text-xs sticky top-24"
     >
       <h2 className="font-heading font-bold text-sm text-ink pb-2 border-b-2 border-ink flex items-center justify-between">

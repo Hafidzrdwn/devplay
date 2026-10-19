@@ -54,6 +54,7 @@ const hasAnyNeighbors = Boolean(previousConcept || nextConcept);
   hasAnyNeighbors && (
     <nav
       aria-label="Article navigation"
+      data-pagefind-ignore
       class:list={[
         'grid grid-cols-1 sm:grid-cols-2 gap-4 mt-12 pt-6 border-t-2 border-ink',
         className,
