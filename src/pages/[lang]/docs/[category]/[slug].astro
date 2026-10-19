@@ -3,6 +3,7 @@ import { getCollection, render } from 'astro:content';
 import { getConcept } from '@/data/concepts';
 import DocsLayout from '@/layouts/DocsLayout.astro';
 import Sidebar from '@/components/layout/Sidebar.astro';
+import PrevNext from '@/components/layout/PrevNext.astro';
 import type { Lang } from '@/i18n/config';
 import type { CategoryId } from '@/types/content';
 
@@ -62,4 +63,5 @@ const { Content, headings } = await render(entry);
 >
   <Sidebar slot="sidebar" lang={lang} currentCategory={category} currentSlug={slug} />
   <Content />
+  <PrevNext slot="footer" slug={slug} lang={lang} />
 </DocsLayout>

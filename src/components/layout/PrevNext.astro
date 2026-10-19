@@ -1,0 +1,186 @@
+---
+import { getNeighbors } from '@/data/concepts';
+import { getCollection } from 'astro:content';
+import { useTranslations } from '@/i18n/ui';
+import type { Lang } from '@/i18n/config';
+
+interface Props {
+  slug: string;
+  lang: Lang;
+  class?: string;
+}
+
+const { slug, lang, class: className } = Astro.props;
+const t = useTranslations(lang);
+
+const allDocs = await getCollection('docs');
+const availableSlugs = new Set<string>();
+
+for (const entry of allDocs) {
+  const normalizedId = entry.id.replace(/\\/g, '/');
+  const [langPart, , filePart] = normalizedId.split('/');
+  if (langPart === lang && filePart) {
+    availableSlugs.add(filePart.replace(/\.mdx$/, ''));
+  }
+}
+
+const rawNeighbors = getNeighbors(slug);
+
+const previousConcept =
+  rawNeighbors.previous &&
+  rawNeighbors.previous.id >= 1 &&
+  rawNeighbors.previous.id <= 50
+    ? rawNeighbors.previous
+    : undefined;
+
+const nextConcept =
+  rawNeighbors.next &&
+  rawNeighbors.next.id >= 1 &&
+  rawNeighbors.next.id <= 50
+    ? rawNeighbors.next
+    : undefined;
+
+const previousHasContent = previousConcept
+  ? availableSlugs.has(previousConcept.slug)
+  : false;
+const nextHasContent = nextConcept
+  ? availableSlugs.has(nextConcept.slug)
+  : false;
+
+const hasAnyNeighbors = Boolean(previousConcept || nextConcept);
+---
+
+{
+  hasAnyNeighbors && (
+    <nav
+      aria-label="Article navigation"
+      class:list={[
+        'grid grid-cols-1 sm:grid-cols-2 gap-4 mt-12 pt-6 border-t-2 border-ink',
+        className,
+      ]}
+    >
+      {previousConcept ? (
+        previousHasContent ? (
+          <a
+            href={`/${lang}/docs/${previousConcept.category}/${previousConcept.slug}/`}
+            rel="prev"
+            class="group flex flex-col gap-1 p-4 rounded-card border-2 border-ink bg-surface shadow-hard transition-all hover:-translate-x-px hover:-translate-y-px hover:shadow-[6px_6px_0_0_var(--ink)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+          >
+            <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-muted uppercase tracking-wider group-hover:text-primary transition-colors">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="shrink-0 transition-transform group-hover:-translate-x-1"
+                aria-hidden="true"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+              {t('nav.prev')}
+            </span>
+            <span class="font-heading text-sm sm:text-base font-bold text-ink truncate">
+              {previousConcept.title[lang]}
+            </span>
+          </a>
+        ) : (
+          <div class="flex flex-col gap-1 p-4 rounded-card border-2 border-ink bg-surface shadow-hard opacity-50 cursor-not-allowed select-none">
+            <div class="flex items-center justify-between">
+              <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-muted uppercase tracking-wider">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="shrink-0"
+                  aria-hidden="true"
+                >
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+                {t('nav.prev')}
+              </span>
+              <span class="rounded border border-ink/30 bg-bg px-1.5 py-0.5 font-mono text-[9px] font-bold text-muted">
+                {t('common.soon')}
+              </span>
+            </div>
+            <span class="font-heading text-sm sm:text-base font-bold text-ink truncate">
+              {previousConcept.title[lang]}
+            </span>
+          </div>
+        )
+      ) : (
+        <div class="hidden sm:block" aria-hidden="true" />
+      )}
+
+      {nextConcept &&
+        (nextHasContent ? (
+          <a
+            href={`/${lang}/docs/${nextConcept.category}/${nextConcept.slug}/`}
+            rel="next"
+            class="group flex flex-col items-end text-right gap-1 p-4 rounded-card border-2 border-ink bg-surface shadow-hard transition-all hover:-translate-x-px hover:-translate-y-px hover:shadow-[6px_6px_0_0_var(--ink)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none sm:col-start-2"
+          >
+            <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-muted uppercase tracking-wider group-hover:text-primary transition-colors">
+              {t('nav.next')}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="shrink-0 transition-transform group-hover:translate-x-1"
+                aria-hidden="true"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </span>
+            <span class="font-heading text-sm sm:text-base font-bold text-ink truncate">
+              {nextConcept.title[lang]}
+            </span>
+          </a>
+        ) : (
+          <div class="flex flex-col items-end text-right gap-1 p-4 rounded-card border-2 border-ink bg-surface shadow-hard opacity-50 cursor-not-allowed select-none sm:col-start-2">
+            <div class="flex items-center justify-between w-full">
+              <span class="rounded border border-ink/30 bg-bg px-1.5 py-0.5 font-mono text-[9px] font-bold text-muted">
+                {t('common.soon')}
+              </span>
+              <span class="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-muted uppercase tracking-wider">
+                {t('nav.next')}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="shrink-0"
+                  aria-hidden="true"
+                >
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </span>
+            </div>
+            <span class="font-heading text-sm sm:text-base font-bold text-ink truncate">
+              {nextConcept.title[lang]}
+            </span>
+          </div>
+        ))}
+    </nav>
+  )
+}

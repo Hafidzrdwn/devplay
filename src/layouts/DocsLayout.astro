@@ -2,6 +2,8 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Sidebar from '@/components/layout/Sidebar.astro';
 import { SidebarDrawer } from '@/components/layout/SidebarDrawer';
+import { Toc, type TocHeading } from '@/components/layout/Toc';
+import PrevNext from '@/components/layout/PrevNext.astro';
 import type { Lang } from '@/i18n/config';
 import type { CategoryId } from '@/types/content';
 import type { MarkdownHeading } from 'astro';
@@ -15,7 +17,15 @@ interface Props {
   headings?: MarkdownHeading[];
 }
 
-const { title, description, lang, category, slug } = Astro.props;
+const { title, description, lang, category, slug, headings = [] } = Astro.props;
+
+const tocHeadings: TocHeading[] = headings
+  .filter((h): h is MarkdownHeading & { depth: 2 | 3 } => h.depth === 2 || h.depth === 3)
+  .map((h) => ({
+    depth: h.depth,
+    slug: h.slug,
+    text: h.text,
+  }));
 ---
 
 <BaseLayout title={`${title} | DevPlay`} description={description} lang={lang}>
@@ -45,11 +55,15 @@ const { title, description, lang, category, slug } = Astro.props;
         <article class="prose max-w-none text-ink">
           <slot />
         </article>
-        <slot name="footer" />
+        <slot name="footer">
+          <PrevNext slug={slug} lang={lang} />
+        </slot>
       </main>
 
-      <aside class="hidden xl:block w-[240px] shrink-0">
-        <slot name="toc" />
+      <aside class="hidden xl:block w-[240px] shrink-0" data-pagefind-ignore>
+        <slot name="toc">
+          <Toc headings={tocHeadings} lang={lang} client:idle />
+        </slot>
       </aside>
     </div>
   </div>

@@ -27,6 +27,9 @@ const id = {
   'search.hint.navigate': 'navigasi',
   'search.hint.select': 'pilih',
   'search.hint.close': 'tutup',
+  'nav.prev': 'Sebelumnya',
+  'nav.next': 'Selanjutnya',
+  'toc.title': 'Di Halaman Ini',
 } as const;
 
 export type UiKey = keyof typeof id;
@@ -58,6 +61,9 @@ const en: Record<UiKey, string> = {
   'search.hint.navigate': 'navigate',
   'search.hint.select': 'select',
   'search.hint.close': 'close',
+  'nav.prev': 'Previous',
+  'nav.next': 'Next',
+  'toc.title': 'On This Page',
 };
 
 export const ui: Record<Lang, Record<UiKey, string>> = { id, en };
