@@ -19,5 +19,20 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            const normalizedId = id.replace(/\\/g, '/');
+            if (
+              normalizedId.includes('node_modules/three') ||
+              normalizedId.includes('node_modules/@react-three')
+            ) {
+              return 'three-vendor';
+            }
+          },
+        },
+      },
+    },
   },
 });
