@@ -25,6 +25,7 @@ export default defineConfig({
   vite: {
     plugins: [tailwindcss()],
     optimizeDeps: {
+      include: ['@radix-ui/react-dialog', 'cmdk'],
       esbuildOptions: {
         sourcemap: 'inline',
       },

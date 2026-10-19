@@ -103,7 +103,7 @@ const feedbackHref = `/${lang}/feedback/`;
       if (trigger && !trigger.dataset.searchBound) {
         trigger.dataset.searchBound = 'true';
         trigger.addEventListener('click', function () {
-          window.dispatchEvent(new CustomEvent('open-search-dialog'));
+          window.dispatchEvent(new CustomEvent('devplay:open-search'));
         });
       }
     }

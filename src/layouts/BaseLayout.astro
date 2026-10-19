@@ -43,7 +43,7 @@ const alternateHref = lang === 'id' ? enHref : idHref;
         window.addEventListener('keydown', function (event) {
           if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
             event.preventDefault();
-            window.dispatchEvent(new CustomEvent('open-search-dialog'));
+            window.dispatchEvent(new CustomEvent('devplay:open-search'));
           }
         });
       })();
@@ -52,6 +52,6 @@ const alternateHref = lang === 'id' ? enHref : idHref;
   <body class="bg-bg text-ink min-h-screen font-sans antialiased">
     <Header lang={lang} />
     <slot />
-    <SearchDialog lang={lang} client:load />
+    <SearchDialog lang={lang} client:idle />
   </body>
 </html>
