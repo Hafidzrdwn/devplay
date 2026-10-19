@@ -1,0 +1,77 @@
+---
+import { switchLangPath } from '@/i18n/utils';
+import { useTranslations } from '@/i18n/ui';
+import type { Lang } from '@/i18n/config';
+
+interface Props {
+  lang: Lang;
+  className?: string;
+}
+
+const { lang, className } = Astro.props;
+const t = useTranslations(lang);
+const currentPath = Astro.url.pathname;
+const idHref = switchLangPath(currentPath, 'id');
+const enHref = switchLangPath(currentPath, 'en');
+---
+
+<nav aria-label={t('lang.switch')} class:list={['inline-flex items-center gap-1 rounded-card border-2 border-ink bg-surface p-0.5 shadow-hard', className]}>
+  <a
+    href={idHref}
+    data-lang-target="id"
+    aria-current={lang === 'id' ? 'page' : undefined}
+    class:list={[
+      'rounded-md px-2 py-0.5 font-mono text-xs font-bold transition-colors',
+      lang === 'id'
+        ? 'bg-accent text-ink'
+        : 'text-muted hover:text-ink',
+    ]}
+  >
+    ID
+  </a>
+  <span class="text-ink/30 font-mono text-[10px]" aria-hidden="true">|</span>
+  <a
+    href={enHref}
+    data-lang-target="en"
+    aria-current={lang === 'en' ? 'page' : undefined}
+    class:list={[
+      'rounded-md px-2 py-0.5 font-mono text-xs font-bold transition-colors',
+      lang === 'en'
+        ? 'bg-accent text-ink'
+        : 'text-muted hover:text-ink',
+    ]}
+  >
+    EN
+  </a>
+</nav>
+
+<script is:inline>
+  (function () {
+    function setupLanguageSwitcher() {
+      var langLinks = document.querySelectorAll('a[data-lang-target]');
+      langLinks.forEach(function (link) {
+        if (link.dataset.langBound) return;
+        link.dataset.langBound = 'true';
+        link.addEventListener('click', function (event) {
+          var targetLang = link.getAttribute('data-lang-target');
+          if (targetLang) {
+            localStorage.setItem('devplay-lang', targetLang);
+          }
+          var currentHash = window.location.hash;
+          if (currentHash) {
+            event.preventDefault();
+            var destinationHref = link.getAttribute('href') || '';
+            window.location.href = destinationHref.split('#')[0] + currentHash;
+          }
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupLanguageSwitcher);
+    } else {
+      setupLanguageSwitcher();
+    }
+    document.addEventListener('astro:page-load', setupLanguageSwitcher);
+  })();
+</script>

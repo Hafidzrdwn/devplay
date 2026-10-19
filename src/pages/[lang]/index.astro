@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
-import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { useTranslations } from '@/i18n/ui';
 import type { Lang } from '@/i18n/config';
 
@@ -18,10 +17,7 @@ const t = useTranslations(lang);
 <BaseLayout title={`DevPlay - ${lang.toUpperCase()}`} lang={lang}>
   <main class="max-w-xl mx-auto p-8 space-y-6">
     <div class="nb-card p-6">
-      <div class="flex items-center justify-between mb-4">
-        <h1 class="font-heading text-3xl font-bold">DevPlay</h1>
-        <ThemeToggle client:load lang={lang} />
-      </div>
+      <h1 class="font-heading text-3xl font-bold mb-2">DevPlay</h1>
       <p class="text-muted mb-4">{lang}</p>
       <span class="nb-badge">{t('nav.docs')}</span>
     </div>

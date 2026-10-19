@@ -2,6 +2,7 @@
 import '@/styles/global.css';
 import type { Lang } from '@/i18n/config';
 import { switchLangPath } from '@/i18n/utils';
+import Header from '@/components/layout/Header.astro';
 
 interface Props {
   title: string;
@@ -33,6 +34,8 @@ const enHref = switchLangPath(currentPath, 'en');
     </script>
   </head>
   <body class="bg-bg text-ink min-h-screen font-sans antialiased">
+    <Header lang={lang} />
     <slot />
   </body>
 </html>
+
