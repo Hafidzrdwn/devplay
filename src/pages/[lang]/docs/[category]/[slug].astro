@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import { getConcept } from '@/data/concepts';
 import DocsLayout from '@/layouts/DocsLayout.astro';
+import Sidebar from '@/components/layout/Sidebar.astro';
 import type { Lang } from '@/i18n/config';
 import type { CategoryId } from '@/types/content';
 
@@ -59,5 +60,6 @@ const { Content, headings } = await render(entry);
   slug={slug}
   headings={headings}
 >
+  <Sidebar slot="sidebar" lang={lang} currentCategory={category} currentSlug={slug} />
   <Content />
 </DocsLayout>

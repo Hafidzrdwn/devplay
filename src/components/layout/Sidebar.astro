@@ -1,0 +1,135 @@
+---
+import { getCollection } from 'astro:content';
+import { categories } from '@/data/categories';
+import { concepts } from '@/data/concepts';
+import { MascotSvg } from '@/components/mascot/MascotSvg';
+import { useTranslations } from '@/i18n/ui';
+import type { Lang } from '@/i18n/config';
+import type { CategoryId, Difficulty } from '@/types/content';
+
+interface Props {
+  lang: Lang;
+  currentCategory?: CategoryId;
+  currentSlug?: string;
+  class?: string;
+}
+
+const { lang, currentCategory, currentSlug, class: className } = Astro.props;
+const t = useTranslations(lang);
+
+const allDocs = await getCollection('docs');
+const availableSlugs = new Set<string>();
+
+for (const entry of allDocs) {
+  const normalizedId = entry.id.replace(/\\/g, '/');
+  const [langPart, , filePart] = normalizedId.split('/');
+  if (langPart === lang && filePart) {
+    availableSlugs.add(filePart.replace(/\.mdx$/, ''));
+  }
+}
+
+const officialConcepts = concepts.filter((concept) => concept.id <= 50);
+
+const difficultyDotColors: Record<Difficulty, string> = {
+  easy: 'bg-success',
+  medium: 'bg-accent',
+  hard: 'bg-danger',
+};
+---
+
+<nav aria-label={t('nav.docs')} class:list={['space-y-3', className]}>
+  {
+    categories.map((cat) => {
+      const categoryConcepts = officialConcepts.filter(
+        (concept) => concept.category === cat.id
+      );
+      const isCategoryActive = cat.id === currentCategory;
+
+      return (
+        <details
+          class="group rounded-card border-2 border-ink bg-surface shadow-hard overflow-hidden"
+          open={isCategoryActive}
+        >
+          <summary class="flex items-center justify-between gap-2 p-3 font-heading text-sm font-bold text-ink cursor-pointer select-none bg-surface hover:bg-bg/60 transition-colors list-none [&::-webkit-details-marker]:hidden">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="shrink-0 size-6 flex items-center justify-center">
+                <MascotSvg crew={cat.lead} variant="head" size={24} />
+              </div>
+              <span class="truncate">{cat.name[lang]}</span>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="inline-flex items-center justify-center rounded border border-ink/40 bg-bg px-1.5 py-0.5 text-xs font-mono font-bold text-ink shadow-[1px_1px_0_0_var(--ink)]">
+                {categoryConcepts.length}
+              </span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="shrink-0 transition-transform duration-200 group-open:rotate-90 text-ink"
+                aria-hidden="true"
+              >
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+          </summary>
+
+          <ul class="border-t-2 border-ink p-2 space-y-1.5 bg-bg/40">
+            {categoryConcepts.map((concept) => {
+              const hasContent = availableSlugs.has(concept.slug);
+              const isActive = concept.slug === currentSlug;
+              const difficultyKey = `difficulty.${concept.difficulty}` as const;
+              const difficultyLabel = t(difficultyKey);
+              const dotColor = difficultyDotColors[concept.difficulty];
+
+              if (!hasContent) {
+                return (
+                  <li class="flex items-center justify-between gap-2 px-2.5 py-2 rounded-md border border-transparent text-xs font-medium text-muted opacity-50 select-none cursor-not-allowed">
+                    <span class="truncate">{concept.title[lang]}</span>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      <span class="inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider">
+                        <span class:list={['size-1.5 rounded-full', dotColor]} aria-hidden="true" />
+                        {difficultyLabel}
+                      </span>
+                      <span class="rounded border border-ink/30 bg-surface px-1.5 py-0.5 font-mono text-[9px] font-bold text-muted">
+                        {t('common.soon')}
+                      </span>
+                    </div>
+                  </li>
+                );
+              }
+
+              return (
+                <li>
+                  <a
+                    href={`/${lang}/docs/${concept.category}/${concept.slug}/`}
+                    aria-current={isActive ? 'page' : undefined}
+                    class:list={[
+                      'flex items-center justify-between gap-2 px-2.5 py-2 rounded-md text-xs font-medium transition-all',
+                      isActive
+                        ? 'bg-accent text-accent-ink font-bold border-2 border-ink shadow-[2px_2px_0_0_var(--ink)] -translate-x-px -translate-y-px'
+                        : 'text-ink hover:bg-surface hover:text-primary border border-transparent hover:border-ink/20',
+                    ]}
+                  >
+                    <span class="truncate">{concept.title[lang]}</span>
+                    <span class="inline-flex items-center gap-1 text-[10px] uppercase font-bold shrink-0">
+                      <span class:list={['size-1.5 rounded-full', dotColor]} aria-hidden="true" />
+                      <span class={isActive ? 'text-accent-ink' : 'text-muted'}>
+                        {difficultyLabel}
+                      </span>
+                    </span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </details>
+      );
+    })
+  }
+</nav>
