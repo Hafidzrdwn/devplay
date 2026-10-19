@@ -1,5 +1,7 @@
 ---
-import '../../styles/global.css';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { useTranslations } from '@/i18n/ui';
+import type { Lang } from '@/i18n/config';
 
 export function getStaticPaths() {
   return [
@@ -8,21 +10,16 @@ export function getStaticPaths() {
   ];
 }
 
-const { lang } = Astro.params;
+const { lang } = Astro.params as { lang: Lang };
+const t = useTranslations(lang);
 ---
 
-<html lang={lang}>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DevPlay - {lang}</title>
-  </head>
-  <body class="bg-bg text-ink min-h-screen p-8 font-sans">
-    <main class="max-w-xl mx-auto space-y-6">
-      <div class="nb-card p-6">
-        <h1 class="font-heading text-3xl font-bold mb-2">DevPlay</h1>
-        <p class="text-muted">{lang}</p>
-      </div>
-    </main>
-  </body>
-</html>
+<BaseLayout title={`DevPlay - ${lang.toUpperCase()}`} lang={lang}>
+  <main class="max-w-xl mx-auto p-8 space-y-6">
+    <div class="nb-card p-6">
+      <h1 class="font-heading text-3xl font-bold mb-2">DevPlay</h1>
+      <p class="text-muted mb-4">{lang}</p>
+      <span class="nb-badge">{t('nav.docs')}</span>
+    </div>
+  </main>
+</BaseLayout>
