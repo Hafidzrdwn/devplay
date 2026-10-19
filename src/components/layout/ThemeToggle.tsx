@@ -14,12 +14,17 @@ export interface ThemeToggleProps {
 export function ThemeToggle({ lang, className }: ThemeToggleProps) {
   const mode = useStore(themeMode);
   const t = useTranslations(lang);
+  const isTransitioningRef = React.useRef(false);
 
   React.useEffect(() => {
     syncThemeFromDocument();
   }, []);
 
   const toggleTheme = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (isTransitioningRef.current) {
+      return;
+    }
+
     const nextMode = mode === 'dark' ? 'light' : 'dark';
 
     if (
@@ -31,6 +36,8 @@ export function ThemeToggle({ lang, className }: ThemeToggleProps) {
       return;
     }
 
+    isTransitioningRef.current = true;
+
     const rect = event.currentTarget.getBoundingClientRect();
     const x = event.clientX || rect.left + rect.width / 2;
     const y = event.clientY || rect.top + rect.height / 2;
@@ -39,36 +46,19 @@ export function ThemeToggle({ lang, className }: ThemeToggleProps) {
       Math.max(y, window.innerHeight - y)
     );
 
+    document.documentElement.style.setProperty('--ripple-x', `${x}px`);
+    document.documentElement.style.setProperty('--ripple-y', `${y}px`);
+    document.documentElement.style.setProperty('--ripple-r', `${endRadius}px`);
     document.documentElement.classList.add('theme-transitioning');
+
     const transition = document.startViewTransition(() => {
       applyTheme(nextMode);
     });
 
-    transition.ready.then(() => {
-      document.documentElement.animate(
-        {
-          clipPath: [
-            `circle(0px at ${x}px ${y}px)`,
-            `circle(${endRadius}px at ${x}px ${y}px)`,
-          ],
-        },
-        {
-          duration: 450,
-          easing: 'ease-in-out',
-          pseudoElement: '::view-transition-new(root)',
-        }
-      );
+    transition.finished.finally(() => {
+      document.documentElement.classList.remove('theme-transitioning');
+      isTransitioningRef.current = false;
     });
-
-    if (transition.finished) {
-      transition.finished.finally(() => {
-        document.documentElement.classList.remove('theme-transitioning');
-      });
-    } else {
-      window.setTimeout(() => {
-        document.documentElement.classList.remove('theme-transitioning');
-      }, 500);
-    }
   };
 
   return (

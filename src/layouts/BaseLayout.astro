@@ -16,6 +16,7 @@ const { title, description = 'DevPlay — Interactive Systems Concepts', lang } 
 const currentPath = Astro.url.pathname;
 const idHref = switchLangPath(currentPath, 'id');
 const enHref = switchLangPath(currentPath, 'en');
+const alternateHref = lang === 'id' ? enHref : idHref;
 ---
 
 <!doctype html>
@@ -27,6 +28,7 @@ const enHref = switchLangPath(currentPath, 'en');
     {description && <meta name="description" content={description} />}
     <link rel="alternate" hreflang="id" href={idHref} />
     <link rel="alternate" hreflang="en" href={enHref} />
+    <link rel="prefetch" href={alternateHref} as="document" />
     <ClientRouter />
     <script is:inline>
       (function () {

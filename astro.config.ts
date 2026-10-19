@@ -9,6 +9,10 @@ export default defineConfig({
   output: 'static',
   adapter: vercel(),
   integrations: [react(), mdx()],
+  prefetch: {
+    prefetchAll: false,
+    defaultStrategy: 'tap',
+  },
   i18n: {
     defaultLocale: 'id',
     locales: ['id', 'en'],
@@ -19,6 +23,11 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      esbuildOptions: {
+        sourcemap: 'inline',
+      },
+    },
     build: {
       rollupOptions: {
         output: {

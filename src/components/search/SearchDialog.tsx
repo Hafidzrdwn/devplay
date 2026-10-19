@@ -18,10 +18,12 @@ interface SearchDialogProps {
 
 export function SearchDialog({ lang }: SearchDialogProps) {
   const t = useTranslations(lang);
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isMounted, setIsMounted] = React.useState(false);
+  const [isVisible, setIsVisible] = React.useState(false);
   const [query, setQuery] = React.useState('');
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const closeTimeoutRef = React.useRef<number | null>(null);
 
   const concepts: ConceptItem[] = React.useMemo(
     () => [
@@ -97,21 +99,37 @@ export function SearchDialog({ lang }: SearchDialogProps) {
   }, [concepts, query]);
 
   const closeDialog = React.useCallback(() => {
-    setIsOpen(false);
-    setQuery('');
-    setSelectedIndex(0);
+    setIsVisible(false);
+    if (closeTimeoutRef.current) {
+      window.clearTimeout(closeTimeoutRef.current);
+    }
+    closeTimeoutRef.current = window.setTimeout(() => {
+      setIsMounted(false);
+      setQuery('');
+      setSelectedIndex(0);
+    }, 160);
   }, []);
 
   const openDialog = React.useCallback(() => {
-    setIsOpen(true);
+    if (closeTimeoutRef.current) {
+      window.clearTimeout(closeTimeoutRef.current);
+    }
+    setIsMounted(true);
+    requestAnimationFrame(() => {
+      setIsVisible(true);
+    });
   }, []);
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
-        setIsOpen((prev) => !prev);
-      } else if (event.key === 'Escape' && isOpen) {
+        if (isVisible) {
+          closeDialog();
+        } else {
+          openDialog();
+        }
+      } else if (event.key === 'Escape' && isVisible) {
         event.preventDefault();
         closeDialog();
       }
@@ -128,10 +146,10 @@ export function SearchDialog({ lang }: SearchDialogProps) {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('open-search-dialog', handleOpenEvent);
     };
-  }, [isOpen, closeDialog, openDialog]);
+  }, [isVisible, closeDialog, openDialog]);
 
   React.useEffect(() => {
-    if (isOpen) {
+    if (isVisible) {
       document.body.style.overflow = 'hidden';
       const timeoutId = window.setTimeout(() => {
         inputRef.current?.focus();
@@ -142,7 +160,7 @@ export function SearchDialog({ lang }: SearchDialogProps) {
       };
     }
     document.body.style.overflow = '';
-  }, [isOpen]);
+  }, [isVisible]);
 
   React.useEffect(() => {
     setSelectedIndex(0);
@@ -170,7 +188,7 @@ export function SearchDialog({ lang }: SearchDialogProps) {
     }
   };
 
-  if (!isOpen) {
+  if (!isMounted) {
     return null;
   }
 
@@ -179,15 +197,28 @@ export function SearchDialog({ lang }: SearchDialogProps) {
       role="dialog"
       aria-modal="true"
       aria-label={t('nav.search')}
-      className="fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-6 md:pt-20"
+      className={cn(
+        'fixed inset-0 z-50 flex items-start justify-center p-3 sm:p-6 md:pt-20',
+        isVisible ? 'pointer-events-auto' : 'pointer-events-none'
+      )}
     >
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-150 animate-in fade-in"
+        className={cn(
+          'fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-150 ease-out',
+          isVisible ? 'opacity-100' : 'opacity-0'
+        )}
         onClick={closeDialog}
         aria-hidden="true"
       />
 
-      <div className="relative z-10 w-full max-w-2xl rounded-card border-2 border-ink bg-surface shadow-[8px_8px_0_0_var(--ink)] transition-all duration-150 animate-in fade-in zoom-in-95 overflow-hidden">
+      <div
+        className={cn(
+          'relative z-10 w-full max-w-2xl rounded-card border-2 border-ink bg-surface shadow-[8px_8px_0_0_var(--ink)] overflow-hidden transition-all duration-150 ease-out transform will-change-[transform,opacity]',
+          isVisible
+            ? 'opacity-100 scale-100 translate-y-0'
+            : 'opacity-0 scale-[0.98] -translate-y-2'
+        )}
+      >
         <div className="flex items-center gap-3 border-b-2 border-ink px-4 py-3 bg-surface">
           <Search className="size-5 shrink-0 text-ink" aria-hidden="true" />
           <input
@@ -244,12 +275,10 @@ export function SearchDialog({ lang }: SearchDialogProps) {
                 <a
                   key={concept.id}
                   href={concept.href}
-                  onMouseEnter={() => setSelectedIndex(index)}
+                  data-astro-prefetch="false"
                   className={cn(
-                    'group flex items-center justify-between gap-3 rounded-md border-2 px-3.5 py-2.5 transition-all cursor-pointer',
-                    isSelected
-                      ? 'border-ink bg-primary/15 shadow-[3px_3px_0_0_var(--ink)] -translate-y-0.5'
-                      : 'border-transparent hover:border-ink/20 hover:bg-bg'
+                    'group flex items-center justify-between gap-3 rounded-md border-2 px-3.5 py-2.5 transition-colors cursor-pointer border-transparent hover:border-ink/40 hover:bg-primary/10',
+                    isSelected && 'border-ink bg-primary/15 shadow-[3px_3px_0_0_var(--ink)]'
                   )}
                 >
                   <div className="flex flex-col gap-0.5 min-w-0">

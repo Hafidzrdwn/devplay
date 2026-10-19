@@ -19,6 +19,7 @@ const enHref = switchLangPath(currentPath, 'en');
   <a
     href={idHref}
     data-lang-target="id"
+    data-astro-prefetch={lang !== 'id' ? 'load' : 'false'}
     aria-current={lang === 'id' ? 'page' : undefined}
     class:list={[
       'rounded-md px-2 py-0.5 font-mono text-xs transition-colors',
@@ -33,6 +34,7 @@ const enHref = switchLangPath(currentPath, 'en');
   <a
     href={enHref}
     data-lang-target="en"
+    data-astro-prefetch={lang !== 'en' ? 'load' : 'false'}
     aria-current={lang === 'en' ? 'page' : undefined}
     class:list={[
       'rounded-md px-2 py-0.5 font-mono text-xs transition-colors',
