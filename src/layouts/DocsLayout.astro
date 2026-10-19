@@ -4,30 +4,37 @@ import Sidebar from '@/components/layout/Sidebar.astro';
 import { SidebarDrawer } from '@/components/layout/SidebarDrawer';
 import { Toc, type TocHeading } from '@/components/layout/Toc';
 import PrevNext from '@/components/layout/PrevNext.astro';
+import ConceptHeader from '@/components/mdx/ConceptHeader.astro';
 import type { Lang } from '@/i18n/config';
-import type { CategoryId, Difficulty, VisualizationKind } from '@/types/content';
+import type { CategoryId, CrewId, Difficulty, VisualizationKind } from '@/types/content';
 import type { MarkdownHeading } from 'astro';
 
 interface Props {
   title: string;
+  tldr?: string;
   description?: string;
   lang: Lang;
   category: CategoryId;
   slug: string;
   headings?: MarkdownHeading[];
   difficulty?: Difficulty;
+  readingMinutes?: number;
+  speaker?: CrewId;
   visualization?: VisualizationKind;
   keywords?: string[];
 }
 
 const {
   title,
+  tldr,
   description,
   lang,
   category,
   slug,
   headings = [],
   difficulty,
+  readingMinutes,
+  speaker,
   visualization,
   keywords = [],
 } = Astro.props;
@@ -41,7 +48,7 @@ const tocHeadings: TocHeading[] = headings
   }));
 ---
 
-<BaseLayout title={`${title} | DevPlay`} description={description} lang={lang}>
+<BaseLayout title={`${title} | DevPlay`} description={tldr ?? description} lang={lang}>
   <div class="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
     <div class="lg:hidden mb-6 flex items-center justify-between gap-4 border-b-2 border-ink pb-4">
       <SidebarDrawer lang={lang} client:media="(max-width: 1023px)">
@@ -65,9 +72,23 @@ const tocHeadings: TocHeading[] = headings
         <meta data-pagefind-filter="category[content]" content={category} />
         {difficulty && <meta data-pagefind-filter="difficulty[content]" content={difficulty} />}
         {visualization && <meta data-pagefind-filter="visualization[content]" content={visualization} />}
-        <h1 class="font-heading text-3xl sm:text-4xl font-bold mb-6 text-ink" data-pagefind-meta="title">
-          {title}
-        </h1>
+        {readingMinutes && difficulty ? (
+          <div class="mb-8">
+            <ConceptHeader
+              lang={lang}
+              title={title}
+              category={category}
+              difficulty={difficulty}
+              readingMinutes={readingMinutes}
+              tldr={tldr ?? description ?? ''}
+              speaker={speaker ?? 'pixel'}
+            />
+          </div>
+        ) : (
+          <h1 class="font-heading text-3xl sm:text-4xl font-bold mb-6 text-ink" data-pagefind-meta="title">
+            {title}
+          </h1>
+        )}
         {keywords.length > 0 && (
           <span hidden data-pagefind-weight="8">{keywords.join(' ')}</span>
         )}

@@ -1,0 +1,36 @@
+---
+import { SpeechBubble } from '@/components/mascot/SpeechBubble';
+import { getCategory } from '@/data/categories';
+import type { CategoryId, CrewId } from '@/types/content';
+
+export interface AnalogyBoxProps {
+  title?: string;
+  emoji?: string;
+  speaker?: CrewId;
+}
+
+type Props = AnalogyBoxProps;
+
+const { title, emoji, speaker } = Astro.props;
+
+const currentCategory = Astro.params.category as CategoryId | undefined;
+const defaultSpeaker: CrewId = currentCategory
+  ? getCategory(currentCategory)?.lead ?? 'pixel'
+  : 'pixel';
+
+const resolvedSpeaker: CrewId = speaker ?? defaultSpeaker;
+---
+
+<div class="my-6">
+  <SpeechBubble crew={resolvedSpeaker}>
+    {(emoji || title) && (
+      <div class="flex items-center gap-2 mb-2 font-heading font-bold text-base text-ink">
+        {emoji && <span class="text-xl leading-none">{emoji}</span>}
+        {title && <span>{title}</span>}
+      </div>
+    )}
+    <div class="space-y-2 leading-relaxed text-ink/90 prose-p:my-2 prose-a:underline">
+      <slot />
+    </div>
+  </SpeechBubble>
+</div>

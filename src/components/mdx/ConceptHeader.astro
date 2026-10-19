@@ -1,0 +1,106 @@
+---
+import { Clock } from 'lucide-react';
+import { MascotSvg } from '@/components/mascot/MascotSvg';
+import { getCategory } from '@/data/categories';
+import { useTranslations } from '@/i18n/ui';
+import type { Lang } from '@/i18n/config';
+import type { CategoryId, CrewId, Difficulty } from '@/types/content';
+
+export interface ConceptHeaderProps {
+  lang: Lang;
+  title: string;
+  category: CategoryId;
+  difficulty: Difficulty;
+  readingMinutes: number;
+  tldr: string;
+  speaker: CrewId;
+}
+
+type Props = ConceptHeaderProps;
+
+const {
+  lang,
+  title,
+  category,
+  difficulty,
+  readingMinutes,
+  tldr,
+  speaker,
+} = Astro.props;
+
+const t = useTranslations(lang);
+const categoryMeta = getCategory(category);
+
+const categoryAccentClasses: Record<string, string> = {
+  accent: 'bg-accent text-accent-ink',
+  primary: 'bg-primary text-white dark:text-ink',
+  info: 'bg-info text-ink',
+  success: 'bg-success text-ink',
+  danger: 'bg-danger text-white dark:text-ink',
+};
+
+const difficultyDotColors: Record<Difficulty, string> = {
+  easy: 'bg-success',
+  medium: 'bg-accent',
+  hard: 'bg-danger',
+};
+
+const readingText = t('reading.time').replace('{n}', String(readingMinutes));
+---
+
+<header class="space-y-4">
+  <div class="flex flex-wrap items-center gap-2.5">
+    <span
+      class:list={[
+        'inline-flex items-center px-2.5 py-1 text-xs font-mono font-bold uppercase rounded border-2 border-ink shadow-[2px_2px_0_0_var(--ink)]',
+        categoryAccentClasses[categoryMeta?.accentColor ?? 'accent'],
+      ]}
+    >
+      {categoryMeta?.name[lang] ?? category}
+    </span>
+
+    <span
+      class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono font-bold rounded border-2 border-ink bg-surface shadow-[2px_2px_0_0_var(--ink)] text-ink"
+    >
+      <span
+        class:list={[
+          'size-2 rounded-full border border-ink',
+          difficultyDotColors[difficulty],
+        ]}
+      />
+      <span>{t(`difficulty.${difficulty}`)}</span>
+    </span>
+
+    <span
+      class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono font-bold rounded border-2 border-ink bg-surface shadow-[2px_2px_0_0_var(--ink)] text-ink"
+    >
+      <Clock size={13} strokeWidth={2.5} className="text-ink" aria-hidden="true" />
+      <span>{readingText}</span>
+    </span>
+  </div>
+
+  <div class="flex items-center gap-4 sm:gap-5 my-2">
+    <div class="shrink-0 size-[72px] flex items-center justify-center">
+      <MascotSvg crew={speaker} size={72} />
+    </div>
+    <h1
+      class="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-ink leading-tight"
+      data-pagefind-meta="title"
+    >
+      {title}
+    </h1>
+  </div>
+
+  <div class="nb-card p-4 sm:p-5 bg-surface text-ink">
+    <div class="flex items-start gap-3">
+      <span
+        class="inline-flex items-center px-2 py-0.5 text-xs font-mono font-bold uppercase rounded border border-ink bg-accent text-accent-ink shrink-0"
+      >
+        TL;DR
+      </span>
+      <p class="text-sm sm:text-base leading-relaxed text-ink font-sans m-0">
+        {tldr}
+      </p>
+    </div>
+  </div>
+</header>

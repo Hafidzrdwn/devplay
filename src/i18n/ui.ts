@@ -31,6 +31,7 @@ const id = {
   'nav.prev': 'Sebelumnya',
   'nav.next': 'Selanjutnya',
   'toc.title': 'Di Halaman Ini',
+  'reading.time': '{n} min',
 } as const;
 
 export type UiKey = keyof typeof id;
@@ -66,6 +67,7 @@ const en: Record<UiKey, string> = {
   'nav.prev': 'Previous',
   'nav.next': 'Next',
   'toc.title': 'On This Page',
+  'reading.time': '{n} min read',
 };
 
 export const ui: Record<Lang, Record<UiKey, string>> = { id, en };

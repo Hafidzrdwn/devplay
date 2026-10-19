@@ -9,24 +9,46 @@ keywords: ['debouncing', 'kinerja', 'frontend', 'optimasi']
 visualization: '2d'
 speaker: 'pixel'
 ---
+import AnalogyBox from '@/components/mdx/AnalogyBox.astro';
+import Callout from '@/components/mdx/Callout.astro';
 
 Debouncing adalah teknik optimasi pada antarmuka web untuk membatasi frekuensi pemanggilan fungsi yang berulang secara cepat, seperti event pengetikan pada input pencarian atau perubahan ukuran jendela browser.
+
+<AnalogyBox title="Pintu Lift yang Menunggu" emoji="🛗">
+Bayangkan pintu lift otomatis yang akan menutup setelah 3 detik jeda. Setiap kali ada orang baru yang masuk dan menekan tombol pintu, timer 3 detik tersebut direset kembali ke nol. Pintu baru akan benar-benar tertutup dan lift bergerak naik setelah hening tanpa penumpang baru selama 3 detik penuh.
+</AnalogyBox>
 
 ## Konsep Dasar Debouncing
 
 Debouncing memastikan bahwa suatu fungsi hanya akan dipanggil setelah pengguna berhenti melakukan aksi dalam kurun waktu tunda yang telah ditentukan.
 
+<Callout variant="info" title="Informasi Siklus Event">
+Dalam arsitektur event loop JavaScript, debouncing memanfaatkan `setTimeout` dan `clearTimeout` agar callback eksekusi dijadwalkan ulang pada antrean timer macrotask.
+</Callout>
+
 ### Mengapa Debouncing Dibutuhkan
 
 Tanpa debouncing, setiap penekanan tombol dapat memicu request jaringan berlebihan yang membebani server dan memperlambat respons aplikasi.
+
+<Callout variant="tip" title="Tips Penentuan Delay">
+Untuk input pencarian teks, rentang penundaan antara 250ms hingga 400ms umumnya merupakan titik seimbang ideal antara responsivitas antarmuka dan efisiensi jaringan.
+</Callout>
 
 ### Perilaku Timer Pembatalan
 
 Setiap kali input baru masuk sebelum timer habis, timer sebelumnya dibatalkan dan digantikan oleh timer baru yang mulai menghitung dari awal.
 
+<Callout variant="warning" title="Peringatan Memory Leak">
+Pastikan timer pembatalan selalu dibersihkan (cleanup) ketika komponen unmount, agar mencegah kebocoran memori atau pemanggilan state pada komponen yang sudah tidak aktif.
+</Callout>
+
 ## Skenario Penggunaan Nyata
 
 Penerapan utama teknik ini ditemukan pada fitur auto-complete kolom pencarian, validasi form dinamis, serta kalkulasi layout saat jendela diubah ukurannya.
+
+<Callout variant="tradeoff" title="Analisis Trade-off">
+Debouncing mengorbankan umpan balik instan demi efisiensi eksekusi. Jangan gunakan debouncing pada tombol aksi kritis seperti tombol submit pembayaran yang membutuhkan konfirmasi seketika.
+</Callout>
 
 ## Ringkasan Praktis
 

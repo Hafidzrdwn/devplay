@@ -1,0 +1,89 @@
+---
+import { Info, Lightbulb, AlertTriangle, Scale } from 'lucide-react';
+import { MascotSvg } from '@/components/mascot/MascotSvg';
+import type { CrewId } from '@/types/content';
+
+export type CalloutVariant = 'info' | 'tip' | 'warning' | 'tradeoff';
+
+export interface CalloutProps {
+  variant: CalloutVariant;
+  title?: string;
+}
+
+type Props = CalloutProps;
+
+const { variant = 'info', title } = Astro.props;
+
+interface VariantConfig {
+  crew: CrewId;
+  icon: typeof Info;
+  cardClass: string;
+  badgeClass: string;
+}
+
+const variantConfigs: Record<CalloutVariant, VariantConfig> = {
+  info: {
+    crew: 'dev',
+    icon: Info,
+    cardClass: 'bg-info/15 dark:bg-info/10',
+    badgeClass: 'bg-info text-ink',
+  },
+  tip: {
+    crew: 'pixel',
+    icon: Lightbulb,
+    cardClass: 'bg-accent/20 dark:bg-accent/10',
+    badgeClass: 'bg-accent text-accent-ink',
+  },
+  warning: {
+    crew: 'bug',
+    icon: AlertTriangle,
+    cardClass: 'bg-danger/15 dark:bg-danger/10',
+    badgeClass: 'bg-danger text-white dark:text-ink',
+  },
+  tradeoff: {
+    crew: 'ops',
+    icon: Scale,
+    cardClass: 'bg-primary/15 dark:bg-primary/10',
+    badgeClass: 'bg-primary text-white dark:text-ink',
+  },
+};
+
+const config = variantConfigs[variant];
+const Icon = config.icon;
+---
+
+<aside
+  role="note"
+  class:list={[
+    'relative my-6 rounded-card border-2 border-ink shadow-hard p-4 sm:p-5 text-ink',
+    config.cardClass,
+  ]}
+>
+  <div class="flex items-start gap-3.5">
+    <div class="shrink-0 pt-0.5">
+      <MascotSvg crew={config.crew} size={40} variant="head" />
+    </div>
+
+    <div class="flex-1 min-w-0">
+      <div class="flex items-center gap-2 mb-2">
+        <span
+          class:list={[
+            'inline-flex items-center justify-center size-6 rounded border border-ink shadow-[1px_1px_0_0_var(--ink)] shrink-0',
+            config.badgeClass,
+          ]}
+        >
+          <Icon size={14} strokeWidth={2.5} aria-hidden="true" />
+        </span>
+        {title && (
+          <span class="font-heading font-bold text-sm sm:text-base text-ink">
+            {title}
+          </span>
+        )}
+      </div>
+
+      <div class="font-sans text-sm sm:text-base leading-relaxed text-ink/90 space-y-2 prose-p:my-1 prose-a:underline prose-code:font-mono">
+        <slot />
+      </div>
+    </div>
+  </div>
+</aside>

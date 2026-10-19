@@ -1,11 +1,14 @@
 ---
 import { getCollection, render } from 'astro:content';
 import { getConcept } from '@/data/concepts';
+import { getCategory } from '@/data/categories';
 import DocsLayout from '@/layouts/DocsLayout.astro';
 import Sidebar from '@/components/layout/Sidebar.astro';
 import PrevNext from '@/components/layout/PrevNext.astro';
+import AnalogyBox from '@/components/mdx/AnalogyBox.astro';
+import Callout from '@/components/mdx/Callout.astro';
 import type { Lang } from '@/i18n/config';
-import type { CategoryId } from '@/types/content';
+import type { CategoryId, CrewId } from '@/types/content';
 
 export async function getStaticPaths() {
   const docs = await getCollection('docs');
@@ -51,20 +54,25 @@ const { lang, category, slug } = Astro.params as {
 };
 
 const { Content, headings } = await render(entry);
+const categoryMeta = getCategory(category);
+const speaker: CrewId = entry.data.speaker ?? categoryMeta?.lead ?? 'pixel';
 ---
 
 <DocsLayout
   title={entry.data.title}
+  tldr={entry.data.tldr}
   description={entry.data.tldr}
   lang={lang}
   category={category}
   slug={slug}
   headings={headings}
   difficulty={entry.data.difficulty}
+  readingMinutes={entry.data.readingMinutes}
+  speaker={speaker}
   visualization={entry.data.visualization}
   keywords={entry.data.keywords}
 >
   <Sidebar slot="sidebar" lang={lang} currentCategory={category} currentSlug={slug} />
-  <Content />
+  <Content components={{ AnalogyBox, Callout }} />
   <PrevNext slot="footer" slug={slug} lang={lang} />
 </DocsLayout>
