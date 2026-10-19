@@ -1,0 +1,41 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import type { Lang } from '@/i18n/config';
+import type { CategoryId } from '@/types/content';
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang: Lang;
+  category: CategoryId;
+  slug: string;
+  headings?: MarkdownHeading[];
+}
+
+const { title, description, lang } = Astro.props;
+---
+
+<BaseLayout title={`${title} | DevPlay`} description={description} lang={lang}>
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)_240px] gap-8 items-start">
+      <aside class="hidden lg:block w-[280px] shrink-0">
+        <slot name="sidebar" />
+      </aside>
+
+      <main class="w-full max-w-[75ch] mx-auto min-w-0">
+        <h1 class="font-heading text-3xl sm:text-4xl font-bold mb-6 text-ink">
+          {title}
+        </h1>
+        <article class="prose max-w-none text-ink">
+          <slot />
+        </article>
+        <slot name="footer" />
+      </main>
+
+      <aside class="hidden xl:block w-[240px] shrink-0">
+        <slot name="toc" />
+      </aside>
+    </div>
+  </div>
+</BaseLayout>

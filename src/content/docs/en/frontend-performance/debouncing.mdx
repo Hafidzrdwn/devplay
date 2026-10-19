@@ -1,0 +1,33 @@
+---
+title: 'Debouncing'
+conceptId: 1
+category: 'frontend-performance'
+difficulty: 'easy'
+readingMinutes: 5
+tldr: 'A technique that postpones function execution until a specific quiet time has passed since the last event.'
+keywords: ['debouncing', 'performance', 'frontend', 'optimization']
+visualization: '2d'
+speaker: 'pixel'
+---
+
+Debouncing is an optimization technique in web applications that limits the rate at which a function executes during rapid, high-frequency events such as keystroke inputs or window resizing.
+
+## Core Concepts of Debouncing
+
+Debouncing guarantees that a target function only runs after a user pauses their input for a designated quiet period.
+
+### Why Debouncing Matters
+
+Without debouncing, every single keystroke could trigger unnecessary network calls that overload backends and degrade user experience.
+
+### Timer Reset Mechanics
+
+Whenever a new input event arrives before the timer expires, the previous timer is cancelled and a fresh timer starts counting down.
+
+## Practical Use Cases
+
+Typical real-world applications include auto-complete search inputs, dynamic form validation, and layout calculations during window resize events.
+
+## Practical Summary
+
+Apply debouncing when your application only needs to respond to the final settled state of a burst of user activity.

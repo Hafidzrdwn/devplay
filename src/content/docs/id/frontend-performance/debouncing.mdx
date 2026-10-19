@@ -1,0 +1,33 @@
+---
+title: 'Debouncing'
+conceptId: 1
+category: 'frontend-performance'
+difficulty: 'easy'
+readingMinutes: 5
+tldr: 'Teknik menunda eksekusi fungsi hingga jeda waktu tertentu berlalu sejak aktivitas terakhir.'
+keywords: ['debouncing', 'kinerja', 'frontend', 'optimasi']
+visualization: '2d'
+speaker: 'pixel'
+---
+
+Debouncing adalah teknik optimasi pada antarmuka web untuk membatasi frekuensi pemanggilan fungsi yang berulang secara cepat, seperti event pengetikan pada input pencarian atau perubahan ukuran jendela browser.
+
+## Konsep Dasar Debouncing
+
+Debouncing memastikan bahwa suatu fungsi hanya akan dipanggil setelah pengguna berhenti melakukan aksi dalam kurun waktu tunda yang telah ditentukan.
+
+### Mengapa Debouncing Dibutuhkan
+
+Tanpa debouncing, setiap penekanan tombol dapat memicu request jaringan berlebihan yang membebani server dan memperlambat respons aplikasi.
+
+### Perilaku Timer Pembatalan
+
+Setiap kali input baru masuk sebelum timer habis, timer sebelumnya dibatalkan dan digantikan oleh timer baru yang mulai menghitung dari awal.
+
+## Skenario Penggunaan Nyata
+
+Penerapan utama teknik ini ditemukan pada fitur auto-complete kolom pencarian, validasi form dinamis, serta kalkulasi layout saat jendela diubah ukurannya.
+
+## Ringkasan Praktis
+
+Gunakan debouncing ketika Anda hanya peduli pada hasil akhir dari serangkaian event yang terjadi secara beruntun.
