@@ -48,3 +48,39 @@ export interface CategoryMeta {
   accentColor: string;
   lead: CrewId;
 }
+
+export interface CrewPalette {
+  shirt: string;
+  accent: string;
+  hat?: string;
+}
+
+export interface CrewMember {
+  id: CrewId;
+  name: string;
+  role: Record<Lang, string>;
+  catchphrase: Record<Lang, string>;
+  leadOf?: CategoryId;
+  palette: CrewPalette;
+}
+
+export interface MascotProps {
+  crew: CrewId;
+  mood?: MascotMood;
+  size?: number;
+  variant?: 'full' | 'head';
+  flip?: boolean;
+  animated?: boolean;
+  label?: string;
+  embed?: { x: number; y: number; scale: number };
+  className?: string;
+}
+
+export interface SpeechBubbleProps {
+  crew: CrewId;
+  mood?: MascotMood;
+  side?: 'left' | 'right';
+  className?: string;
+  children: import('react').ReactNode;
+}
+

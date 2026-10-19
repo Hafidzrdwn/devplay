@@ -1,0 +1,107 @@
+:root {
+  --mascot-skin: #ff9d42;
+  --mascot-skin-light: #ffba75;
+  --mascot-skin-dark: #d97724;
+}
+
+.dark {
+  --mascot-skin: #e67e22;
+  --mascot-skin-light: #ff9d42;
+  --mascot-skin-dark: #b85d10;
+}
+
+@keyframes mascot-bob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes mascot-blink {
+  0%, 90%, 100% {
+    transform: scaleY(1);
+  }
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes mascot-jump {
+  0%, 100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  30% {
+    transform: translateY(-8px) scale(0.96, 1.04);
+  }
+  60% {
+    transform: translateY(2px) scale(1.04, 0.96);
+  }
+}
+
+@keyframes mascot-shake {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  20% {
+    transform: translateX(-3px) rotate(-2deg);
+  }
+  40% {
+    transform: translateX(3px) rotate(2deg);
+  }
+  60% {
+    transform: translateX(-2px) rotate(-1deg);
+  }
+  80% {
+    transform: translateX(2px) rotate(1deg);
+  }
+}
+
+.mascot-animated.mascot-idle {
+  animation: mascot-bob 3s ease-in-out infinite;
+}
+
+.mascot-animated.mascot-happy {
+  animation: mascot-bob 2s ease-in-out infinite;
+}
+
+.mascot-animated.mascot-thinking {
+  transform-origin: 60px 140px;
+  transform: rotate(3deg);
+  animation: mascot-bob 4s ease-in-out infinite;
+}
+
+.mascot-animated.mascot-confused {
+  transform-origin: 60px 140px;
+  animation: mascot-shake 2.5s ease-in-out infinite;
+}
+
+.mascot-animated.mascot-panic {
+  transform-origin: 60px 140px;
+  animation: mascot-shake 0.4s ease-in-out infinite;
+}
+
+.mascot-animated.mascot-celebrate {
+  animation: mascot-jump 0.9s ease-in-out infinite;
+}
+
+.mascot-eyes {
+  transform-origin: 54px 64px;
+  animation: mascot-blink 4s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascot-animated,
+  .mascot-animated.mascot-idle,
+  .mascot-animated.mascot-happy,
+  .mascot-animated.mascot-thinking,
+  .mascot-animated.mascot-confused,
+  .mascot-animated.mascot-panic,
+  .mascot-animated.mascot-celebrate,
+  .mascot-eyes {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
