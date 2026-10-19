@@ -21,10 +21,10 @@ const enHref = switchLangPath(currentPath, 'en');
     data-lang-target="id"
     aria-current={lang === 'id' ? 'page' : undefined}
     class:list={[
-      'rounded-md px-2 py-0.5 font-mono text-xs font-bold transition-colors',
+      'rounded-md px-2 py-0.5 font-mono text-xs transition-colors',
       lang === 'id'
-        ? 'bg-accent text-ink'
-        : 'text-muted hover:text-ink',
+        ? 'bg-accent text-neutral-950 font-extrabold shadow-[1px_1px_0_0_var(--ink)]'
+        : 'text-muted font-bold hover:text-ink',
     ]}
   >
     ID
@@ -35,10 +35,10 @@ const enHref = switchLangPath(currentPath, 'en');
     data-lang-target="en"
     aria-current={lang === 'en' ? 'page' : undefined}
     class:list={[
-      'rounded-md px-2 py-0.5 font-mono text-xs font-bold transition-colors',
+      'rounded-md px-2 py-0.5 font-mono text-xs transition-colors',
       lang === 'en'
-        ? 'bg-accent text-ink'
-        : 'text-muted hover:text-ink',
+        ? 'bg-accent text-neutral-950 font-extrabold shadow-[1px_1px_0_0_var(--ink)]'
+        : 'text-muted font-bold hover:text-ink',
     ]}
   >
     EN
@@ -52,16 +52,15 @@ const enHref = switchLangPath(currentPath, 'en');
       langLinks.forEach(function (link) {
         if (link.dataset.langBound) return;
         link.dataset.langBound = 'true';
-        link.addEventListener('click', function (event) {
+        link.addEventListener('click', function () {
           var targetLang = link.getAttribute('data-lang-target');
           if (targetLang) {
             localStorage.setItem('devplay-lang', targetLang);
           }
           var currentHash = window.location.hash;
           if (currentHash) {
-            event.preventDefault();
             var destinationHref = link.getAttribute('href') || '';
-            window.location.href = destinationHref.split('#')[0] + currentHash;
+            link.setAttribute('href', destinationHref.split('#')[0] + currentHash);
           }
         });
       });

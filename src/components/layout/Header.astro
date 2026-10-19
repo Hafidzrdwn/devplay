@@ -95,3 +95,19 @@ const feedbackHref = `/${lang}/feedback/`;
     </div>
   </div>
 </header>
+
+<script is:inline>
+  (function () {
+    function setupSearchTrigger() {
+      var trigger = document.getElementById('search-trigger');
+      if (trigger && !trigger.dataset.searchBound) {
+        trigger.dataset.searchBound = 'true';
+        trigger.addEventListener('click', function () {
+          window.dispatchEvent(new CustomEvent('open-search-dialog'));
+        });
+      }
+    }
+    setupSearchTrigger();
+    document.addEventListener('astro:page-load', setupSearchTrigger);
+  })();
+</script>

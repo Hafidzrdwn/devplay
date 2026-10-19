@@ -19,8 +19,56 @@ export function ThemeToggle({ lang, className }: ThemeToggleProps) {
     syncThemeFromDocument();
   }, []);
 
-  const toggleTheme = () => {
-    applyTheme(mode === 'dark' ? 'light' : 'dark');
+  const toggleTheme = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const nextMode = mode === 'dark' ? 'light' : 'dark';
+
+    if (
+      typeof document === 'undefined' ||
+      !('startViewTransition' in document) ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      applyTheme(nextMode);
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX || rect.left + rect.width / 2;
+    const y = event.clientY || rect.top + rect.height / 2;
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    document.documentElement.classList.add('theme-transitioning');
+    const transition = document.startViewTransition(() => {
+      applyTheme(nextMode);
+    });
+
+    transition.ready.then(() => {
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${endRadius}px at ${x}px ${y}px)`,
+          ],
+        },
+        {
+          duration: 450,
+          easing: 'ease-in-out',
+          pseudoElement: '::view-transition-new(root)',
+        }
+      );
+    });
+
+    if (transition.finished) {
+      transition.finished.finally(() => {
+        document.documentElement.classList.remove('theme-transitioning');
+      });
+    } else {
+      window.setTimeout(() => {
+        document.documentElement.classList.remove('theme-transitioning');
+      }, 500);
+    }
   };
 
   return (

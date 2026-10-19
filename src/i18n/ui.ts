@@ -20,6 +20,13 @@ const id = {
   'quiz.wrong': 'Kurang tepat',
   'quiz.retry': 'Coba lagi',
   'common.soon': 'Segera hadir',
+  'search.placeholder': 'Cari konsep, simulasi, atau arsitektur...',
+  'search.quick': 'Rekomendasi Konsep',
+  'search.empty': 'Tidak ada konsep yang cocok',
+  'search.dev_notice': 'Indeks Pagefind lengkap aktif pada build produksi',
+  'search.hint.navigate': 'navigasi',
+  'search.hint.select': 'pilih',
+  'search.hint.close': 'tutup',
 } as const;
 
 export type UiKey = keyof typeof id;
@@ -44,6 +51,13 @@ const en: Record<UiKey, string> = {
   'quiz.wrong': 'Incorrect',
   'quiz.retry': 'Try again',
   'common.soon': 'Coming soon',
+  'search.placeholder': 'Search concepts, simulations, or architecture...',
+  'search.quick': 'Recommended Concepts',
+  'search.empty': 'No matching concepts found',
+  'search.dev_notice': 'Full Pagefind index is available on production build',
+  'search.hint.navigate': 'navigate',
+  'search.hint.select': 'select',
+  'search.hint.close': 'close',
 };
 
 export const ui: Record<Lang, Record<UiKey, string>> = { id, en };

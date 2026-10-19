@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { useTranslations } from '@/i18n/ui';
 import type { Lang } from '@/i18n/config';
+import { MascotSvg } from '@/components/mascot/MascotSvg';
 
 export function getStaticPaths() {
   return [
@@ -15,11 +16,21 @@ const t = useTranslations(lang);
 ---
 
 <BaseLayout title={`DevPlay - ${lang.toUpperCase()}`} lang={lang}>
-  <main class="max-w-xl mx-auto p-8 space-y-6">
-    <div class="nb-card p-6">
-      <h1 class="font-heading text-3xl font-bold mb-2">DevPlay</h1>
-      <p class="text-muted mb-4">{lang}</p>
-      <span class="nb-badge">{t('nav.docs')}</span>
+  <main class="max-w-2xl mx-auto p-6 sm:p-10 space-y-6">
+    <div class="nb-card p-6 flex flex-col sm:flex-row items-center gap-6">
+      <MascotSvg crew="dev" mood="happy" size={100} animated={true} />
+      <div class="space-y-3 text-center sm:text-left">
+        <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+          <span class="nb-badge bg-accent font-bold">Neobrutalism</span>
+          <span class="nb-badge">{t('nav.docs')}</span>
+        </div>
+        <h1 class="font-heading text-3xl font-bold">DevPlay</h1>
+        <p class="text-muted text-sm max-w-md">
+          {lang === 'id'
+            ? 'Platform simulasi visual interaktif untuk konsep sistem software, konkurensi, dan performa.'
+            : 'Interactive visual simulation platform for software systems, concurrency, and performance.'}
+        </p>
+      </div>
     </div>
   </main>
 </BaseLayout>

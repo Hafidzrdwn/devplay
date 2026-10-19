@@ -378,21 +378,23 @@ function renderMoodFace(mood: MascotMood): JSX.Element {
       return (
         <g>
           <g className="mascot-eyes" stroke="none">
-            <rect x="42" y="58" width="6" height="7" rx="1" fill="var(--ink)" />
-            <rect x="62" y="58" width="6" height="7" rx="1" fill="var(--ink)" />
+            <rect x="42" y="58" width="6" height="7" rx="1" fill="#1b1b1f" />
+            <rect x="62" y="58" width="6" height="7" rx="1" fill="#1b1b1f" />
           </g>
           <line
             x1="49"
             y1="76"
             x2="61"
             y2="76"
+            stroke="#1b1b1f"
+            strokeWidth="2"
             strokeLinecap="round"
           />
         </g>
       );
     case 'happy':
       return (
-        <g fill="none">
+        <g fill="none" stroke="#1b1b1f">
           <path
             d="M 40 62 Q 45 54 50 62"
             strokeWidth="2.5"
@@ -405,13 +407,14 @@ function renderMoodFace(mood: MascotMood): JSX.Element {
           />
           <path
             d="M 47 74 Q 55 82 63 74"
+            strokeWidth="2"
             strokeLinecap="round"
           />
         </g>
       );
     case 'thinking':
       return (
-        <g>
+        <g stroke="#1b1b1f">
           <line
             x1="39"
             y1="52"
@@ -429,57 +432,57 @@ function renderMoodFace(mood: MascotMood): JSX.Element {
             strokeLinecap="round"
           />
           <g className="mascot-eyes" stroke="none">
-            <rect x="42" y="58" width="6" height="6" rx="1" fill="var(--ink)" />
-            <circle cx="66" cy="60" r="3" fill="var(--ink)" />
+            <rect x="42" y="58" width="6" height="6" rx="1" fill="#1b1b1f" />
+            <circle cx="66" cy="60" r="3" fill="#1b1b1f" />
           </g>
           <path
             d="M 49 76 Q 55 73 61 76"
             fill="none"
+            strokeWidth="2"
             strokeLinecap="round"
           />
         </g>
       );
     case 'confused':
       return (
-        <g>
+        <g stroke="#1b1b1f">
           <g stroke="none">
-            <circle cx="44" cy="60" r="4.5" fill="var(--ink)" />
-            <circle cx="66" cy="60" r="2.5" fill="var(--ink)" />
+            <circle cx="44" cy="60" r="4.5" fill="#1b1b1f" />
+            <circle cx="66" cy="60" r="2.5" fill="#1b1b1f" />
           </g>
           <path
             d="M 46 76 Q 51 72 55 76 T 64 76"
             fill="none"
+            strokeWidth="2"
             strokeLinecap="round"
           />
         </g>
       );
     case 'panic':
       return (
-        <g>
-          <circle cx="43" cy="60" r="5" fill="none" />
-          <circle cx="43" cy="60" r="2" fill="var(--ink)" stroke="none" />
-          <circle cx="67" cy="60" r="5" fill="none" />
-          <circle cx="67" cy="60" r="2" fill="var(--ink)" stroke="none" />
+        <g stroke="#1b1b1f">
+          <circle cx="43" cy="60" r="5" fill="#ffffff" stroke="#1b1b1f" strokeWidth="1.5" />
+          <circle cx="43" cy="60" r="2" fill="#1b1b1f" stroke="none" />
+          <circle cx="67" cy="60" r="5" fill="#ffffff" stroke="#1b1b1f" strokeWidth="1.5" />
+          <circle cx="67" cy="60" r="2" fill="#1b1b1f" stroke="none" />
           <path
             d="M 76 46 Q 78 40 80 46 Q 80 50 78 50 Q 76 50 76 46 Z"
             fill="var(--info)"
             stroke="none"
           />
-          <ellipse cx="55" cy="78" rx="4" ry="6" fill="var(--ink)" stroke="none" />
+          <ellipse cx="55" cy="78" rx="4" ry="6" fill="#1b1b1f" stroke="none" />
         </g>
       );
     case 'celebrate':
       return (
-        <g>
+        <g fill="none" stroke="#1b1b1f">
           <path
             d="M 40 62 Q 45 54 50 62"
-            fill="none"
             strokeWidth="2.5"
             strokeLinecap="round"
           />
           <path
             d="M 60 62 Q 65 54 70 62"
-            fill="none"
             strokeWidth="2.5"
             strokeLinecap="round"
           />
@@ -487,6 +490,7 @@ function renderMoodFace(mood: MascotMood): JSX.Element {
             d="M 47 73 Q 55 85 63 73 Z"
             fill="var(--accent)"
             strokeLinejoin="round"
+            strokeWidth="2"
           />
         </g>
       );
@@ -523,8 +527,8 @@ export function MascotSvg({
           cy="152"
           rx="34"
           ry="6"
-          fill="var(--ink)"
-          opacity="0.18"
+          fill="#000000"
+          opacity="0.25"
           stroke="none"
         />
       )}

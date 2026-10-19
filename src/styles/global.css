@@ -13,6 +13,7 @@
   --muted: #6b6b76;
   --primary: #7c5cff;
   --accent: #ffc933;
+  --accent-ink: #14131a;
   --success: #2fbf71;
   --danger: #ff5c5c;
   --info: #3ba7ff;
@@ -34,6 +35,7 @@
   --muted: #a19fb0;
   --primary: #a48dff;
   --accent: #ffd65c;
+  --accent-ink: #14131a;
   --success: #4ade94;
   --danger: #ff7a7a;
   --info: #6bbfff;
@@ -53,6 +55,7 @@
   --color-muted: var(--muted);
   --color-primary: var(--primary);
   --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
   --color-success: var(--success);
   --color-danger: var(--danger);
   --color-info: var(--info);
@@ -80,6 +83,11 @@
   cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 
+  &.bg-accent,
+  &[class*="bg-accent"] {
+    color: var(--accent-ink);
+  }
+
   &:hover {
     transform: translate(-1px, -1px);
     box-shadow: 6px 6px 0 0 var(--ink);
@@ -102,4 +110,23 @@
   padding: 0.125rem 0.625rem;
   font-size: 0.75rem;
   font-weight: 600;
+
+  &.bg-accent,
+  &[class*="bg-accent"] {
+    color: var(--accent-ink);
+  }
+}
+
+html.theme-transitioning::view-transition-old(root),
+html.theme-transitioning::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+html.theme-transitioning::view-transition-old(root) {
+  z-index: 1;
+}
+
+html.theme-transitioning::view-transition-new(root) {
+  z-index: 9999;
 }
