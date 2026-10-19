@@ -1,0 +1,104 @@
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #fff8ec;
+  --surface: #ffffff;
+  --ink: #1b1b1f;
+  --muted: #6b6b76;
+  --primary: #7c5cff;
+  --accent: #ffc933;
+  --success: #2fbf71;
+  --danger: #ff5c5c;
+  --info: #3ba7ff;
+  --grid: #e7dfce;
+  --radius: 14px;
+  --shadow-hard: 4px 4px 0 0 var(--ink);
+
+  --background: var(--bg);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --border: var(--ink);
+  --ring: var(--primary);
+}
+
+.dark {
+  --bg: #14131a;
+  --surface: #1e1c27;
+  --ink: #f5f1e8;
+  --muted: #a19fb0;
+  --primary: #a48dff;
+  --accent: #ffd65c;
+  --success: #4ade94;
+  --danger: #ff7a7a;
+  --info: #6bbfff;
+  --grid: #2e2b3b;
+
+  --background: var(--bg);
+  --foreground: var(--ink);
+  --card: var(--surface);
+  --border: var(--ink);
+  --ring: var(--primary);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-grid: var(--grid);
+  --radius-card: var(--radius);
+  --shadow-hard: var(--shadow-hard);
+  --font-heading: 'Space Grotesk Variable', sans-serif;
+  --font-sans: 'Inter Variable', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', monospace;
+}
+
+@utility nb-card {
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-hard);
+  background-color: var(--surface);
+}
+
+@utility nb-button {
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-hard);
+  background-color: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+
+  &:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 6px 6px 0 0 var(--ink);
+  }
+
+  &:active {
+    transform: translate(4px, 4px);
+    box-shadow: 0 0 0 0 var(--ink);
+  }
+}
+
+@utility nb-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 2px solid var(--ink);
+  border-radius: 9999px;
+  box-shadow: 2px 2px 0 0 var(--ink);
+  background-color: var(--surface);
+  color: var(--ink);
+  padding: 0.125rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
