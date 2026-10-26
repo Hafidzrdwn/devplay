@@ -27,6 +27,7 @@ export function SpeechBubble({
           size={56}
           variant="head"
           flip={isRight}
+          className="size-10 min-[400px]:size-14"
         />
       </div>
 

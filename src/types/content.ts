@@ -84,3 +84,36 @@ export interface SpeechBubbleProps {
   children: import('react').ReactNode;
 }
 
+export interface SimulationSlider {
+  id: string;
+  label: string;
+  min: number;
+  max: number;
+  step: number;
+  value: number;
+  unit?: string;
+  onChange: (value: number) => void;
+}
+
+export interface SimulationStepControls {
+  stepIndex: number;
+  stepCount: number;
+  onNext: () => void;
+  onPrevious?: () => void;
+}
+
+export interface SimulationContainerProps {
+  lang: Lang;
+  title: string;
+  kind: VisualizationKind;
+  caption: string;
+  onReset: () => void;
+  stepControls?: SimulationStepControls;
+  sliders?: SimulationSlider[];
+  minHeight?: number;
+  children: import('react').ReactNode;
+  narrator?: CrewId;
+  mood?: MascotMood;
+  className?: string;
+}
+
