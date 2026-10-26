@@ -130,3 +130,17 @@ export interface CodeCompareProps {
   className?: string;
 }
 
+export interface QuickCheckOption {
+  id: string;
+  text: string;
+  explanation: string;
+}
+
+export interface QuickCheckProps {
+  lang: Lang;
+  question: string;
+  options: QuickCheckOption[];
+  correctOptionId: string;
+  className?: string;
+}
+
