@@ -5,75 +5,136 @@ category: 'frontend-performance'
 difficulty: 'easy'
 readingMinutes: 5
 tldr: 'Teknik menunda eksekusi fungsi hingga jeda waktu tertentu berlalu sejak aktivitas terakhir.'
-keywords: ['debouncing', 'kinerja', 'frontend', 'optimasi']
+keywords: ['debouncing', 'input lag', 'search autocomplete', 'rate limiting', 'event loop', 'pembatalan timer', 'kinerja frontend']
 visualization: '2d'
-speaker: 'pixel'
 ---
 import AnalogyBox from '@/components/mdx/AnalogyBox.astro';
 import Callout from '@/components/mdx/Callout.astro';
+import CodeCompare from '@/components/mdx/CodeCompare';
+import QuickCheck from '@/components/mdx/QuickCheck';
+import DebouncingSim from '@/components/simulations/frontend/debouncing/Debouncing';
 
-Debouncing adalah teknik optimasi pada antarmuka web untuk membatasi frekuensi pemanggilan fungsi yang berulang secara cepat, seperti event pengetikan pada input pencarian atau perubahan ukuran jendela browser.
+Pernahkah Anda mengetik kata kunci di kolom pencarian toko online, lalu antarmuka web mendadak tersendat karena server dibombardir puluhan request di setiap ketukan keyboard? Masalah klasik ini terjadi karena event pendengar bereaksi terlalu agresif terhadap aktivitas pengguna yang berlangsung cepat.
 
-<AnalogyBox title="Pintu Lift yang Menunggu" emoji="🛗">
-Bayangkan pintu lift otomatis yang akan menutup setelah 3 detik jeda. Setiap kali ada orang baru yang masuk dan menekan tombol pintu, timer 3 detik tersebut direset kembali ke nol. Pintu baru akan benar-benar tertutup dan lift bergerak naik setelah hening tanpa penumpang baru selama 3 detik penuh.
+Alih-alih mengeksekusi aksi berat di setiap perubahan kecil, kita membutuhkan mekanisme peredam yang cerdas. Di sinilah teknik debouncing hadir sebagai solusi elegan untuk menahan pemanggilan fungsi hingga pengguna benar-benar selesai berinteraksi.
+
+<AnalogyBox title="Pintu Lift yang Menunggu Penumpang">
+Bayangkan sebuah pintu lift otomatis yang diprogram untuk menutup setelah 3 detik hening. Setiap kali ada penumpang baru melangkah masuk dan menekan tombol pintu, countdown 3 detik tersebut langsung direset kembali ke awal. Pintu baru akan benar-benar tertutup rapat dan lift bergerak naik hanya jika tidak ada penumpang baru yang masuk selama 3 detik penuh tanpa gangguan.
 </AnalogyBox>
 
-## Konsep Dasar Debouncing
+<DebouncingSim client:visible lang="id" />
 
-Debouncing memastikan bahwa suatu fungsi hanya akan dipanggil setelah pengguna berhenti melakukan aksi dalam kurun waktu tunda yang telah ditentukan.
+## Cara Kerja
 
-<Callout variant="info" title="Informasi Siklus Event">
-Dalam arsitektur event loop JavaScript, debouncing memanfaatkan `setTimeout` dan `clearTimeout` agar callback eksekusi dijadwalkan ulang pada antrean timer macrotask.
+Inti dari debouncing adalah mengabaikan rentetan pemicu sementara dan hanya mengeksekusi pemicu paling akhir setelah kondisi tenang tercapai. Di balik layar, pola ini mengandalkan timer asinkron pada lingkungan runtime JavaScript.
+
+Ketika suatu event pertama kali terdeteksi, fungsi pembungkus mencatat ID timer baru menggunakan `setTimeout`. Jika event berikutnya datang sebelum durasi jeda waktu habis, timer sebelumnya langsung dibatalkan menggunakan `clearTimeout`, lalu timer baru dijadwalkan ulang dengan durasi penuh.
+
+Siklus pembatalan ini berulang terus-menerus selama pengguna masih aktif mengetik atau menggeser ukuran jendela. Begitu rentetan aksi berhenti dan jeda waktu tercapai tanpa interupsi, fungsi target akhirnya dijalankan tepat satu kali.
+
+## Kapan Dipakai
+
+Debouncing sangat ideal diterapkan pada situasi ketika sistem hanya membutuhkan kondisi akhir yang stabil dari serangkaian input beruntun:
+
+- **Autocomplete Kolom Pencarian**: Mengirim query ke server hanya setelah pengguna berhenti mengetik kata pencarian, menghemat beban database hingga 80%.
+- **Penyimpanan Otomatis Draft (Auto-save)**: Menyimpan perubahan dokumen ke penyimpanan lokal atau API beberapa ratus milidetik setelah pengguna berhenti menulis.
+- **Kalkulasi Layout saat Window Resize**: Menghitung ulang dimensi elemen responsif kompleks setelah pengguna selesai mengatur ukuran jendela peramban.
+- **Validasi Ketersediaan Username**: Memeriksa keunikan nama pengguna ke server saat pengguna selesai mengisi formulir pendaftaran.
+
+## Trade-off
+
+Meskipun sangat efektif mengurangi beban komputasi dan lalu lintas jaringan, debouncing membawa konsekuensi berupa latensi buatan yang disengaja.
+
+<Callout variant="tradeoff" title="Analisis Kompromi Latensi">
+Debouncing menukar umpan balik instan demi efisiensi eksekusi. Jangan pernah menerapkan debouncing pada tombol aksi transaksional instan seperti tombol checkout belanjaan atau tombol tembak pada game web, karena jeda buatan akan membuat aplikasi terasa lambat dan tidak responsif.
 </Callout>
 
-### Mengapa Debouncing Dibutuhkan
+Jika nilai delay disetel terlalu panjang, pengguna akan merasa antarmuka lambat merespons. Sebaliknya jika terlalu pendek, manfaat penghematan komputasi menjadi kurang optimal. Rentang delay antara 250 ms hingga 400 ms biasanya merupakan titik seimbang terbaik untuk interaksi input teks.
 
-Tanpa debouncing, setiap penekanan tombol dapat memicu request jaringan berlebihan yang membebani server dan memperlambat respons aplikasi.
+## Praktik Buruk vs Baik
 
-Berikut adalah beberapa keuntungan utama implementasi debouncing:
-- **Penghematan Bandwidth**: Menghindari pengiriman HTTP request yang sia-sia di setiap ketikan keyboard.
-- **Konservasi Thread Utama**: Mengurangi beban kalkulasi DOM dan rendering layout berulang kali.
-- **Mencegah Race Condition**: Memastikan response API yang diterima mencerminkan input termutakhir dari pengguna.
+Banyak pengembang pemula langsung menautkan pemanggilan API asinkron ke event listener input formulir. Hal ini tidak hanya membebani server dengan request sia-sia, tetapi juga memicu masalah race condition di mana response lama menimpa data yang lebih baru.
 
-<Callout variant="tip" title="Tips Penentuan Delay">
-Untuk input pencarian teks, rentang penundaan antara `250ms` hingga `400ms` umumnya merupakan titik seimbang ideal antara responsivitas antarmuka dan efisiensi jaringan.
-</Callout>
+Solusi yang tepat adalah membungkus logika pemanggilan dalam utilitas debounce generik yang mempertahankan tipe data parameter secara aman dan mengelola pembersihan timer.
 
-### Perilaku Timer Pembatalan
+<CodeCompare
+  client:visible
+  lang="id"
+  language="ts"
+  bad={{
+    code: `function initSearchInput(inputElement: HTMLInputElement) {
+  inputElement.addEventListener('input', async (event) => {
+    const target = event.target as HTMLInputElement;
+    const query = target.value;
+    const response = await fetch(\`/api/search?q=\${encodeURIComponent(query)}\`);
+    const results = await response.json();
+    renderSearchResults(results);
+  });
+}`,
+    caption: 'Buruk: Request jaringan dikirim pada setiap penekanan tombol tanpa jeda penahan.',
+  }}
+  good={{
+    code: `function debounce<Args extends unknown[]>(
+  targetFunction: (...args: Args) => void,
+  delayMs: number
+): (...args: Args) => void {
+  let timerId: ReturnType<typeof setTimeout> | undefined;
 
-Setiap kali input baru masuk sebelum timer habis, timer sebelumnya dibatalkan dan digantikan oleh timer baru yang mulai menghitung dari awal.
+  return (...args: Args) => {
+    if (timerId !== undefined) {
+      clearTimeout(timerId);
+    }
+    timerId = setTimeout(() => {
+      targetFunction(...args);
+    }, delayMs);
+  };
+}
 
-Langkah-langkah eksekusi timer pembatalan:
-1. Pengguna mengetik karakter pertama, fungsi mencatat timer awal.
-2. Pengguna mengetik karakter kedua dalam rentang waktu tunggu, timer awal dibatalkan dengan `clearTimeout`.
-3. Timer baru diinisiasi ulang dengan durasi penuh.
-4. Setelah jeda hening tercapai, callback utama dieksekusi secara tuntas.
+function initSearchInput(inputElement: HTMLInputElement) {
+  const debouncedFetch = debounce(async (query: string) => {
+    const response = await fetch(\`/api/search?q=\${encodeURIComponent(query)}\`);
+    const results = await response.json();
+    renderSearchResults(results);
+  }, 350);
 
-<Callout variant="warning" title="Peringatan Memory Leak">
-Pastikan timer pembatalan selalu dibersihkan (cleanup) ketika komponen unmount, agar mencegah kebocoran memori atau pemanggilan state pada komponen yang sudah tidak aktif.
-</Callout>
+  inputElement.addEventListener('input', (event) => {
+    const target = event.target as HTMLInputElement;
+    debouncedFetch(target.value);
+  });
+}`,
+    caption: 'Baik: Menggunakan utilitas debounce bertipe generik dengan pembatalan timer otomatis.',
+  }}
+/>
 
-## Perbandingan: Debouncing vs Throttling
+## Uji Pemahaman
 
-Kedua teknik ini sering disandingkan namun memiliki strategi eksekusi yang berbeda mendasar:
+Uji pemahaman Anda mengenai perbedaan karakteristik debouncing dengan teknik optimasi event lainnya:
 
-| Karakteristik | Debouncing | Throttling |
-| :--- | :--- | :--- |
-| **Waktu Eksekusi** | Setelah periode hening (*settled state*) | Secara periodik pada interval reguler |
-| **Frekuensi Output** | Tepat 1 kali di akhir rentetan event | Maksimal 1 kali per interval $N$ ms |
-| **Kasus Penggunaan** | Search autocomplete, resize recalculation | Scroll tracking, game animation, mouse move |
-| **Titik Kritis** | Menunggu jeda tanpa aksi | Menjamin update berkala tetap berjalan |
-
-> Debouncing berfokus pada hasil akhir setelah badai event mereda, sedangkan throttling menjaga laju aliran event tetap teratur di tengah badai tersebut.
-
-## Skenario Penggunaan Nyata
-
-Penerapan utama teknik ini ditemukan pada fitur auto-complete kolom pencarian, validasi form dinamis, serta kalkulasi layout saat jendela diubah ukurannya. Pelajari panduan resmi arsitektur event loop di [MDN Web Docs tentang Concurrency Model](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop) untuk pemahaman lebih mendalam.
-
-<Callout variant="tradeoff" title="Analisis Trade-off">
-Debouncing mengorbankan umpan balik instan demi efisiensi eksekusi. Jangan gunakan debouncing pada tombol aksi kritis seperti tombol submit pembayaran yang membutuhkan konfirmasi seketika.
-</Callout>
-
-## Ringkasan Praktis
-
-Gunakan debouncing ketika Anda hanya peduli pada hasil akhir dari serangkaian event yang terjadi secara beruntun.
+<QuickCheck
+  client:visible
+  lang="id"
+  question="Kapan Anda sebaiknya memilih teknik Debouncing alih-alih Throttling?"
+  correctOptionId="b"
+  options={[
+    {
+      id: "a",
+      text: "Ketika Anda ingin callback dieksekusi secara periodik pada interval reguler selama scrolling.",
+      explanation: "Pola pemanggilan berkala dengan interval reguler adalah ciri khas Throttling, bukan Debouncing."
+    },
+    {
+      id: "b",
+      text: "Ketika Anda hanya peduli pada hasil akhir setelah serangkaian aktivitas pengguna mereda dan hening sejenak.",
+      explanation: "Tepat sekali! Debouncing menunda eksekusi hingga ada jeda hening tanpa interaksi baru, ideal untuk input pencarian dan auto-save."
+    },
+    {
+      id: "c",
+      text: "Ketika Anda membutuhkan feedback instan pada setiap frame animasi 60 FPS di layar.",
+      explanation: "Untuk animasi 60 FPS kita menggunakan requestAnimationFrame, bukan Debouncing yang sengaja menunda eksekusi."
+    },
+    {
+      id: "d",
+      text: "Ketika Anda ingin membatalkan request HTTP yang sudah terlanjur terkirim di jaringan.",
+      explanation: "Pembatalan request HTTP dalam perjalanan menggunakan AbortController, bukan algoritma Debouncing di sisi client."
+    }
+  ]}
+/>

@@ -144,3 +144,7 @@ export interface QuickCheckProps {
   className?: string;
 }
 
+export interface SimulationProps {
+  lang: Lang;
+}
+

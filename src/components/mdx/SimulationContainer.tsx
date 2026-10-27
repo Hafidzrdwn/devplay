@@ -69,10 +69,10 @@ export function SimulationContainer({
         className
       )}
     >
-      <div className="flex items-center justify-between border-b-2 border-ink bg-surface px-4 py-3 select-none">
-        <h3 className="font-heading font-bold text-base sm:text-lg text-ink truncate m-0">
+      <div className="flex items-center justify-between border-b-2 border-ink bg-surface px-4 py-2.5 select-none">
+        <div role="heading" aria-level={3} className="font-heading font-bold text-base text-ink truncate m-0 leading-tight">
           {title}
-        </h3>
+        </div>
         <span
           className={cn(
             'inline-flex items-center rounded border-2 border-ink px-2 py-0.5 text-xs font-mono font-bold shadow-[2px_2px_0_0_var(--ink)] uppercase shrink-0',
@@ -134,7 +134,7 @@ export function SimulationContainer({
                   aria-valuenow={slider.value}
                   aria-valuetext={`${slider.value}${slider.unit ? ` ${slider.unit}` : ''}`}
                   onChange={(event) => slider.onChange(Number(event.target.value))}
-                  className="h-10 w-full cursor-pointer appearance-none bg-transparent accent-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded"
+                  className="nb-range-slider my-2 w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 />
               </div>
             ))}

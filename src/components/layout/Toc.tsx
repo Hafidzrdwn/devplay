@@ -80,6 +80,7 @@ export function Toc({ headings, lang }: TocProps): React.JSX.Element | null {
         {headings.map((heading) => {
           const isActive = heading.slug === activeSlug;
           const isH3 = heading.depth === 3;
+          const displayText = heading.text.replace(/\s*#$/, '');
 
           return (
             <li
@@ -96,7 +97,7 @@ export function Toc({ headings, lang }: TocProps): React.JSX.Element | null {
                     : 'text-muted hover:text-ink hover:bg-bg/50'
                 )}
               >
-                {heading.text}
+                {displayText}
               </a>
             </li>
           );
