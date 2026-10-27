@@ -4,12 +4,42 @@ import mdx from '@astrojs/mdx';
 import vercel from '@astrojs/vercel';
 import tailwindcss from '@tailwindcss/vite';
 import pagefind from 'astro-pagefind';
+import { rehypeHeadingIds } from '@astrojs/markdown-remark';
+import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeExternalLinks from 'rehype-external-links';
 
 export default defineConfig({
   site: 'https://devplay.vercel.app',
   output: 'static',
   adapter: vercel(),
   integrations: [react(), mdx(), pagefind()],
+  markdown: {
+    rehypePlugins: [
+      rehypeHeadingIds,
+      [
+        rehypeAutolinkHeadings,
+        {
+          behavior: 'append',
+          content: {
+            type: 'text',
+            value: ' #',
+          },
+          properties: {
+            class: 'heading-anchor',
+            'aria-hidden': 'true',
+            tabIndex: -1,
+          },
+        },
+      ],
+      [
+        rehypeExternalLinks,
+        {
+          target: '_blank',
+          rel: ['noopener', 'noreferrer'],
+        },
+      ],
+    ],
+  },
   prefetch: {
     prefetchAll: false,
     defaultStrategy: 'tap',

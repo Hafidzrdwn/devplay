@@ -30,21 +30,45 @@ Dalam arsitektur event loop JavaScript, debouncing memanfaatkan `setTimeout` dan
 
 Tanpa debouncing, setiap penekanan tombol dapat memicu request jaringan berlebihan yang membebani server dan memperlambat respons aplikasi.
 
+Berikut adalah beberapa keuntungan utama implementasi debouncing:
+- **Penghematan Bandwidth**: Menghindari pengiriman HTTP request yang sia-sia di setiap ketikan keyboard.
+- **Konservasi Thread Utama**: Mengurangi beban kalkulasi DOM dan rendering layout berulang kali.
+- **Mencegah Race Condition**: Memastikan response API yang diterima mencerminkan input termutakhir dari pengguna.
+
 <Callout variant="tip" title="Tips Penentuan Delay">
-Untuk input pencarian teks, rentang penundaan antara 250ms hingga 400ms umumnya merupakan titik seimbang ideal antara responsivitas antarmuka dan efisiensi jaringan.
+Untuk input pencarian teks, rentang penundaan antara `250ms` hingga `400ms` umumnya merupakan titik seimbang ideal antara responsivitas antarmuka dan efisiensi jaringan.
 </Callout>
 
 ### Perilaku Timer Pembatalan
 
 Setiap kali input baru masuk sebelum timer habis, timer sebelumnya dibatalkan dan digantikan oleh timer baru yang mulai menghitung dari awal.
 
+Langkah-langkah eksekusi timer pembatalan:
+1. Pengguna mengetik karakter pertama, fungsi mencatat timer awal.
+2. Pengguna mengetik karakter kedua dalam rentang waktu tunggu, timer awal dibatalkan dengan `clearTimeout`.
+3. Timer baru diinisiasi ulang dengan durasi penuh.
+4. Setelah jeda hening tercapai, callback utama dieksekusi secara tuntas.
+
 <Callout variant="warning" title="Peringatan Memory Leak">
 Pastikan timer pembatalan selalu dibersihkan (cleanup) ketika komponen unmount, agar mencegah kebocoran memori atau pemanggilan state pada komponen yang sudah tidak aktif.
 </Callout>
 
+## Perbandingan: Debouncing vs Throttling
+
+Kedua teknik ini sering disandingkan namun memiliki strategi eksekusi yang berbeda mendasar:
+
+| Karakteristik | Debouncing | Throttling |
+| :--- | :--- | :--- |
+| **Waktu Eksekusi** | Setelah periode hening (*settled state*) | Secara periodik pada interval reguler |
+| **Frekuensi Output** | Tepat 1 kali di akhir rentetan event | Maksimal 1 kali per interval $N$ ms |
+| **Kasus Penggunaan** | Search autocomplete, resize recalculation | Scroll tracking, game animation, mouse move |
+| **Titik Kritis** | Menunggu jeda tanpa aksi | Menjamin update berkala tetap berjalan |
+
+> Debouncing berfokus pada hasil akhir setelah badai event mereda, sedangkan throttling menjaga laju aliran event tetap teratur di tengah badai tersebut.
+
 ## Skenario Penggunaan Nyata
 
-Penerapan utama teknik ini ditemukan pada fitur auto-complete kolom pencarian, validasi form dinamis, serta kalkulasi layout saat jendela diubah ukurannya.
+Penerapan utama teknik ini ditemukan pada fitur auto-complete kolom pencarian, validasi form dinamis, serta kalkulasi layout saat jendela diubah ukurannya. Pelajari panduan resmi arsitektur event loop di [MDN Web Docs tentang Concurrency Model](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop) untuk pemahaman lebih mendalam.
 
 <Callout variant="tradeoff" title="Analisis Trade-off">
 Debouncing mengorbankan umpan balik instan demi efisiensi eksekusi. Jangan gunakan debouncing pada tombol aksi kritis seperti tombol submit pembayaran yang membutuhkan konfirmasi seketika.

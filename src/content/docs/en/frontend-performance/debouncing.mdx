@@ -30,21 +30,45 @@ In the JavaScript runtime, debouncing leverages `setTimeout` and `clearTimeout` 
 
 Without debouncing, every single keystroke could trigger unnecessary network calls that overload backends and degrade user experience.
 
+Key architectural benefits include:
+- **Bandwidth Conservation**: Eliminates wasteful HTTP round-trips for transient character sequences.
+- **Main Thread Offloading**: Drastically reduces layout thrashing and redundant DOM updates.
+- **Race Condition Prevention**: Ensures the backend response matches the user's latest settled intent.
+
 <Callout variant="tip" title="Choosing the Right Delay">
-For live text search inputs, a debounce window between 250ms and 400ms is usually the sweet spot between snappy UI responsiveness and backend workload.
+For live text search inputs, a debounce window between `250ms` and `400ms` is usually the sweet spot between snappy UI responsiveness and backend workload.
 </Callout>
 
 ### Timer Reset Mechanics
 
 Whenever a new input event arrives before the timer expires, the previous timer is cancelled and a fresh timer starts counting down.
 
+Sequential execution phases:
+1. User types the first character, initiating a fresh timeout handle.
+2. User types a second character within the quiet window; `clearTimeout` revokes the pending timer.
+3. A brand new timer is spawned with the full countdown duration.
+4. Once the user stops typing and the countdown finishes, the target callback runs.
+
 <Callout variant="warning" title="Memory Leak Warning">
 Always ensure your pending timers are cancelled during component unmount lifecycle hooks to avoid memory leaks and stale state updates on unmounted elements.
 </Callout>
 
+## Comparison: Debouncing vs Throttling
+
+While both techniques control invocation rates, their execution paradigms differ fundamentally:
+
+| Feature / Trait | Debouncing | Throttling |
+| :--- | :--- | :--- |
+| **Execution Timing** | After a quiet period has elapsed | Periodically at regular tick intervals |
+| **Output Frequency** | Exactly once after event burst ceases | At most once per interval of $N$ ms |
+| **Use Cases** | Search autocomplete, window resizing | Infinite scrolling, mouse tracking, gaming |
+| **Core Goal** | Waiting for settled final intent | Enforcing steady guaranteed cadence |
+
+> Debouncing cares only about the destination after the storm passes, whereas throttling ensures steady meter marks while the storm is ongoing.
+
 ## Practical Use Cases
 
-Typical real-world applications include auto-complete search inputs, dynamic form validation, and layout calculations during window resize events.
+Typical real-world applications include auto-complete search inputs, dynamic form validation, and layout calculations during window resize events. Explore the official [MDN Web Docs on the JavaScript Event Loop](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Event_loop) for deeper architectural fundamentals.
 
 <Callout variant="tradeoff" title="Trade-off Consideration">
 Debouncing trades instantaneous feedback for execution efficiency. Avoid debouncing on critical transactional actions like checkout payment buttons that require immediate acknowledgment.

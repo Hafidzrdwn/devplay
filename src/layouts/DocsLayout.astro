@@ -62,7 +62,7 @@ const tocHeadings: TocHeading[] = headings
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)_240px] gap-8 items-start">
-      <aside class="hidden lg:block w-[280px] shrink-0" data-pagefind-ignore>
+      <aside class="hidden lg:block w-70 shrink-0" data-pagefind-ignore>
         <slot name="sidebar">
           <Sidebar lang={lang} currentCategory={category} currentSlug={slug} />
         </slot>
@@ -92,7 +92,7 @@ const tocHeadings: TocHeading[] = headings
         {keywords.length > 0 && (
           <span hidden data-pagefind-weight="8">{keywords.join(' ')}</span>
         )}
-        <article class="prose max-w-none text-ink">
+        <article class="prose-devplay max-w-[75ch] text-ink">
           <slot />
         </article>
         <slot name="footer">
@@ -100,7 +100,7 @@ const tocHeadings: TocHeading[] = headings
         </slot>
       </main>
 
-      <aside class="hidden xl:block w-[240px] shrink-0" data-pagefind-ignore>
+      <aside class="hidden xl:block w-60 shrink-0" data-pagefind-ignore>
         <slot name="toc">
           <Toc headings={tocHeadings} lang={lang} client:idle />
         </slot>

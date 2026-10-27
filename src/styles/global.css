@@ -3,6 +3,7 @@
 @import '@fontsource-variable/jetbrains-mono';
 @import 'tailwindcss';
 @import './mascot.css';
+@import './prose.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
