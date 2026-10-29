@@ -3,7 +3,11 @@ import { MascotSvg } from '@/components/mascot/MascotSvg';
 import { useTranslations } from '@/i18n/ui';
 import { cn } from '@/lib/cn';
 import { highlightCode, type HighlightLanguage } from '@/lib/highlight';
-import type { CodeCompareProps, CodeSample } from '@/types/content';
+import type {
+  CodeCompareExample,
+  CodeCompareProps,
+  CodeSample,
+} from '@/types/content';
 
 type LayoutMode = 'tab' | 'stack';
 type ActiveTab = 'bad' | 'good';
@@ -13,9 +17,44 @@ export function CodeCompare({
   language,
   bad,
   good,
+  examples,
+  defaultExampleId,
   className,
 }: CodeCompareProps): React.JSX.Element {
   const t = useTranslations(lang);
+
+  const normalizedExamples = React.useMemo<CodeCompareExample[]>(() => {
+    if (examples && examples.length > 0) {
+      return examples;
+    }
+    if (language && bad && good) {
+      return [
+        {
+          id: 'default',
+          label: language.toUpperCase(),
+          language,
+          bad,
+          good,
+        },
+      ];
+    }
+    return [];
+  }, [examples, language, bad, good]);
+
+  const [selectedExampleId, setSelectedExampleId] = React.useState<string>(() => {
+    if (defaultExampleId && normalizedExamples.some((ex) => ex.id === defaultExampleId)) {
+      return defaultExampleId;
+    }
+    return normalizedExamples[0]?.id ?? 'default';
+  });
+
+  const currentExample = React.useMemo(() => {
+    return (
+      normalizedExamples.find((ex) => ex.id === selectedExampleId) ??
+      normalizedExamples[0]
+    );
+  }, [normalizedExamples, selectedExampleId]);
+
   const [layout, setLayout] = React.useState<LayoutMode>('tab');
   const [activeTab, setActiveTab] = React.useState<ActiveTab>('bad');
   const [badHtml, setBadHtml] = React.useState<string | null>(null);
@@ -24,15 +63,24 @@ export function CodeCompare({
   const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   React.useEffect(() => {
+    if (!currentExample) {
+      return;
+    }
     let isMounted = true;
 
-    highlightCode(bad.code, language as HighlightLanguage).then((html) => {
+    highlightCode(
+      currentExample.bad.code,
+      currentExample.language as HighlightLanguage
+    ).then((html) => {
       if (isMounted) {
         setBadHtml(html);
       }
     });
 
-    highlightCode(good.code, language as HighlightLanguage).then((html) => {
+    highlightCode(
+      currentExample.good.code,
+      currentExample.language as HighlightLanguage
+    ).then((html) => {
       if (isMounted) {
         setGoodHtml(html);
       }
@@ -41,7 +89,7 @@ export function CodeCompare({
     return () => {
       isMounted = false;
     };
-  }, [bad.code, good.code, language]);
+  }, [currentExample]);
 
   React.useEffect(() => {
     if (!isModalOpen) {
@@ -64,22 +112,33 @@ export function CodeCompare({
     };
   }, [isModalOpen]);
 
-  const handleCopy = React.useCallback(async (type: 'bad' | 'good') => {
-    const textToCopy = type === 'bad' ? bad.code : good.code;
-    try {
-      await navigator.clipboard.writeText(textToCopy);
-      setCopiedType(type);
-      setTimeout(() => {
+  const handleCopy = React.useCallback(
+    async (type: 'bad' | 'good') => {
+      if (!currentExample) {
+        return;
+      }
+      const textToCopy =
+        type === 'bad' ? currentExample.bad.code : currentExample.good.code;
+      try {
+        await navigator.clipboard.writeText(textToCopy);
+        setCopiedType(type);
+        setTimeout(() => {
+          setCopiedType(null);
+        }, 2000);
+      } catch {
         setCopiedType(null);
-      }, 2000);
-    } catch {
-      setCopiedType(null);
-    }
-  }, [bad.code, good.code]);
+      }
+    },
+    [currentExample]
+  );
+
+  if (!currentExample) {
+    return <div className="hidden" />;
+  }
 
   const renderPanel = (type: 'bad' | 'good') => {
     const isBad = type === 'bad';
-    const sample: CodeSample = isBad ? bad : good;
+    const sample: CodeSample = isBad ? currentExample.bad : currentExample.good;
     const html = isBad ? badHtml : goodHtml;
     const borderClass = isBad ? 'border-danger' : 'border-success';
     const headerBgClass = isBad ? 'bg-danger/10' : 'bg-success/10';
@@ -121,7 +180,7 @@ export function CodeCompare({
                   : 'border-success/40 bg-surface text-success shadow-[1px_1px_0_0_var(--success)]'
               )}
             >
-              {language}
+              {currentExample.language}
             </span>
 
             <button
@@ -190,44 +249,82 @@ export function CodeCompare({
     );
   };
 
+  const renderLanguageSelector = () => {
+    if (normalizedExamples.length <= 1) {
+      return null;
+    }
+
+    return (
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <span className="text-xs font-mono font-bold text-muted uppercase tracking-wider hidden sm:inline">
+          {lang === 'id' ? 'Bahasa:' : 'Language:'}
+        </span>
+        <div className="inline-flex rounded-lg border-2 border-ink bg-surface p-1 shadow-[2px_2px_0_0_var(--ink)] gap-1">
+          {normalizedExamples.map((ex) => {
+            const isSelected = ex.id === currentExample.id;
+            return (
+              <button
+                key={ex.id}
+                type="button"
+                onClick={() => setSelectedExampleId(ex.id)}
+                className={cn(
+                  'inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono font-bold transition-all cursor-pointer',
+                  isSelected
+                    ? 'bg-accent text-accent-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
+                    : 'text-muted hover:text-ink hover:bg-bg/60'
+                )}
+              >
+                <span>{ex.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className={cn('my-6 w-full min-w-0', className)}>
       <div className="flex flex-wrap items-center justify-between gap-2.5 mb-3 select-none">
-        {layout === 'tab' ? (
-          <div className="inline-flex rounded-lg border-2 border-ink bg-surface p-1 shadow-[2px_2px_0_0_var(--ink)] gap-1">
-            <button
-              type="button"
-              onClick={() => setActiveTab('bad')}
-              className={cn(
-                'inline-flex items-center gap-2 px-3 py-1.5 rounded text-xs sm:text-sm font-mono font-bold transition-all cursor-pointer',
-                activeTab === 'bad'
-                  ? 'bg-danger text-danger-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
-                  : 'text-muted hover:text-ink hover:bg-bg/60'
-              )}
-            >
-              <MascotSvg crew="bug" mood="confused" size={18} variant="head" />
-              <span>{t('code.bad')}</span>
-            </button>
+        <div className="flex items-center gap-2.5 flex-wrap">
+          {renderLanguageSelector()}
 
-            <button
-              type="button"
-              onClick={() => setActiveTab('good')}
-              className={cn(
-                'inline-flex items-center gap-2 px-3 py-1.5 rounded text-xs sm:text-sm font-mono font-bold transition-all cursor-pointer',
-                activeTab === 'good'
-                  ? 'bg-success text-success-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
-                  : 'text-muted hover:text-ink hover:bg-bg/60'
-              )}
-            >
-              <MascotSvg crew="dev" mood="happy" size={18} variant="head" />
-              <span>{t('code.good')}</span>
-            </button>
-          </div>
-        ) : (
-          <div className="text-xs font-mono font-bold uppercase tracking-wider text-muted">
-            {lang === 'id' ? 'Tampilan Bertumpuk' : 'Stacked View'}
-          </div>
-        )}
+          {layout === 'tab' ? (
+            <div className="inline-flex rounded-lg border-2 border-ink bg-surface p-1 shadow-[2px_2px_0_0_var(--ink)] gap-1">
+              <button
+                type="button"
+                onClick={() => setActiveTab('bad')}
+                className={cn(
+                  'inline-flex items-center gap-2 px-3 py-1.5 rounded text-xs sm:text-sm font-mono font-bold transition-all cursor-pointer',
+                  activeTab === 'bad'
+                    ? 'bg-danger text-danger-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
+                    : 'text-muted hover:text-ink hover:bg-bg/60'
+                )}
+              >
+                <MascotSvg crew="bug" mood="confused" size={18} variant="head" />
+                <span>{t('code.bad')}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('good')}
+                className={cn(
+                  'inline-flex items-center gap-2 px-3 py-1.5 rounded text-xs sm:text-sm font-mono font-bold transition-all cursor-pointer',
+                  activeTab === 'good'
+                    ? 'bg-success text-success-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
+                    : 'text-muted hover:text-ink hover:bg-bg/60'
+                )}
+              >
+                <MascotSvg crew="dev" mood="happy" size={18} variant="head" />
+                <span>{t('code.good')}</span>
+              </button>
+            </div>
+          ) : (
+            <div className="text-xs font-mono font-bold uppercase tracking-wider text-muted">
+              {lang === 'id' ? 'Tampilan Bertumpuk' : 'Stacked View'}
+            </div>
+          )}
+        </div>
 
         <div className="inline-flex rounded-lg border-2 border-ink bg-surface p-1 shadow-[2px_2px_0_0_var(--ink)] gap-1 ml-auto">
           <button
@@ -342,21 +439,24 @@ export function CodeCompare({
           }}
         >
           <div className="relative flex flex-col w-full max-w-7xl h-[92vh] max-h-240 rounded-card border-2 border-ink bg-surface shadow-[8px_8px_0_0_var(--ink)] overflow-hidden">
-            <div className="flex items-center justify-between border-b-2 border-ink bg-surface px-4 sm:px-6 py-3 select-none shrink-0">
-              <div className="flex items-center gap-3 min-w-0">
+            <div className="flex items-center justify-between border-b-2 border-ink bg-surface px-4 sm:px-6 py-3 select-none shrink-0 gap-3">
+              <div className="flex items-center gap-3 min-w-0 flex-wrap">
                 <span className="inline-flex items-center rounded border border-ink bg-accent px-2 py-0.5 text-xs font-mono font-bold text-accent-ink uppercase shadow-[1px_1px_0_0_var(--ink)]">
-                  {language}
+                  {currentExample.language}
                 </span>
                 <span className="font-heading font-bold text-base sm:text-lg text-ink truncate">
-                  {lang === 'id' ? 'Komparasi Praktik: Buruk vs Baik' : 'Code Comparison: Bad vs Good'}
+                  {lang === 'id'
+                    ? `Komparasi Praktik: Buruk vs Baik (${currentExample.label})`
+                    : `Code Comparison: Bad vs Good (${currentExample.label})`}
                 </span>
+                {renderLanguageSelector()}
               </div>
 
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
                 aria-label={lang === 'id' ? 'Tutup komparasi layar penuh' : 'Close fullscreen comparison'}
-                className="inline-flex items-center gap-1.5 rounded-card border-2 border-ink bg-bg px-3 py-1.5 text-xs font-mono font-bold text-ink shadow-[2px_2px_0_0_var(--ink)] hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_var(--ink)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+                className="inline-flex items-center gap-1.5 rounded-card border-2 border-ink bg-bg px-3 py-1.5 text-xs font-mono font-bold text-ink shadow-[2px_2px_0_0_var(--ink)] hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_var(--ink)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer shrink-0"
               >
                 <svg
                   viewBox="0 0 24 24"

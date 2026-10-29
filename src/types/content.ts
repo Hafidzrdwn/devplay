@@ -117,16 +117,28 @@ export interface SimulationContainerProps {
   className?: string;
 }
 
+export type CodeLanguage = 'ts' | 'js' | 'sql' | 'json' | 'bash' | 'html';
+
 export interface CodeSample {
   code: string;
   caption?: string;
 }
 
-export interface CodeCompareProps {
-  lang: Lang;
-  language: 'ts' | 'js' | 'sql' | 'json' | 'bash' | 'html';
+export interface CodeCompareExample {
+  id: string;
+  label: string;
+  language: CodeLanguage;
   bad: CodeSample;
   good: CodeSample;
+}
+
+export interface CodeCompareProps {
+  lang: Lang;
+  language?: CodeLanguage;
+  bad?: CodeSample;
+  good?: CodeSample;
+  examples?: CodeCompareExample[];
+  defaultExampleId?: string;
   className?: string;
 }
 

@@ -409,11 +409,22 @@ export interface CodeSample {
   caption?: string;
 }
 
-export interface CodeCompareProps {
-  lang: Lang;
+export interface CodeCompareExample {
+  id: string;
+  label: string;
   language: 'ts' | 'js' | 'sql' | 'json' | 'bash' | 'html';
   bad: CodeSample;
   good: CodeSample;
+}
+
+export interface CodeCompareProps {
+  lang: Lang;
+  language?: 'ts' | 'js' | 'sql' | 'json' | 'bash' | 'html';
+  bad?: CodeSample;
+  good?: CodeSample;
+  examples?: CodeCompareExample[];
+  defaultExampleId?: string;
+  className?: string;
 }
 
 export interface QuickCheckOption {
@@ -435,7 +446,8 @@ Kontrak di atas diperluas oleh bagian 8.3: prop `speaker` pada ConceptHeader dan
 Perilaku wajib:
 
 - **SimulationContainer**: caption di `aria-live='polite'`; tombol Reset selalu ada; panel slider/step hanya muncul bila prop diberikan; menghormati `prefers-reduced-motion` (animasi otomatis berhenti, mode step tetap jalan); `minHeight` mencegah layout shift.
-- **CodeCompare**: tab ❌ Bad / ✅ Good (di layar lebar berdampingan); highlight `shiki/core` fine-grained dengan engine JavaScript, di-import dinamis; `<pre>` polos sebagai fallback sebelum siap.
+- **CodeCompare**: mendukung selector multi-bahasa/framework dinamis (`examples: [...]`) yang relevan dengan materi (misal TypeScript, Vanilla JS, React hook, Vue composable, dsb.); view mode Tab / Stack; Fullscreen Modal berdampingan satu layar penuh dengan tombol Tutup (Esc); highlight `shiki/core` fine-grained dengan engine JavaScript dinamis; high-contrast tokens di dark mode.
+- **Real-World UI Playground**: selain simulasi alur teknis 2D/3D, sertakan mini-playground interaktif kasus nyata yang kontekstual (misal kotak live search autocomplete dengan log request API untuk debouncing) agar pembaca dapat mencoba langsung dari sudut pandang antarmuka pengguna.
 - **QuickCheck**: pilihan ganda 3-4 opsi; setelah menjawab, tampilkan penjelasan untuk semua opsi; tombol Coba Lagi; hasil benar disimpan di `progress` store (localStorage `devplay-progress`).
 - **Callout / AnalogyBox / ConceptHeader**: komponen Astro statis tanpa JS.
 

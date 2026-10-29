@@ -13,6 +13,7 @@ import Callout from '@/components/mdx/Callout.astro';
 import CodeCompare from '@/components/mdx/CodeCompare';
 import QuickCheck from '@/components/mdx/QuickCheck';
 import DebouncingSim from '@/components/simulations/frontend/debouncing/Debouncing';
+import DebounceSearchPlayground from '@/components/simulations/frontend/debouncing/DebounceSearchPlayground';
 
 Pernahkah Anda mengetik kata kunci di kolom pencarian toko online, lalu antarmuka web mendadak tersendat karena server dibombardir puluhan request di setiap ketukan keyboard? Masalah klasik ini terjadi karena event pendengar bereaksi terlalu agresif terhadap aktivitas pengguna yang berlangsung cepat.
 
@@ -41,6 +42,8 @@ Debouncing sangat ideal diterapkan pada situasi ketika sistem hanya membutuhkan 
 - **Kalkulasi Layout saat Window Resize**: Menghitung ulang dimensi elemen responsif kompleks setelah pengguna selesai mengatur ukuran jendela peramban.
 - **Validasi Ketersediaan Username**: Memeriksa keunikan nama pengguna ke server saat pengguna selesai mengisi formulir pendaftaran.
 
+<DebounceSearchPlayground client:idle lang="id" />
+
 ## Trade-off
 
 Meskipun sangat efektif mengurangi beban komputasi dan lalu lintas jaringan, debouncing membawa konsekuensi berupa latensi buatan yang disengaja.
@@ -60,9 +63,13 @@ Solusi yang tepat adalah membungkus logika pemanggilan dalam utilitas debounce g
 <CodeCompare
   client:visible
   lang="id"
-  language="ts"
-  bad={{
-    code: `function initSearchInput(inputElement: HTMLInputElement) {
+  examples={[
+    {
+      id: 'ts',
+      label: 'TypeScript',
+      language: 'ts',
+      bad: {
+        code: `function initSearchInput(inputElement: HTMLInputElement) {
   inputElement.addEventListener('input', async (event) => {
     const target = event.target as HTMLInputElement;
     const query = target.value;
@@ -71,10 +78,10 @@ Solusi yang tepat adalah membungkus logika pemanggilan dalam utilitas debounce g
     renderSearchResults(results);
   });
 }`,
-    caption: 'Buruk: Request jaringan dikirim pada setiap penekanan tombol tanpa jeda penahan.',
-  }}
-  good={{
-    code: `function debounce<Args extends unknown[]>(
+        caption: 'Buruk: Request jaringan dikirim pada setiap penekanan tombol tanpa jeda penahan.',
+      },
+      good: {
+        code: `function debounce<Args extends unknown[]>(
   targetFunction: (...args: Args) => void,
   delayMs: number
 ): (...args: Args) => void {
@@ -102,8 +109,95 @@ function initSearchInput(inputElement: HTMLInputElement) {
     debouncedFetch(target.value);
   });
 }`,
-    caption: 'Baik: Menggunakan utilitas debounce bertipe generik dengan pembatalan timer otomatis.',
-  }}
+        caption: 'Baik: Menggunakan utilitas debounce bertipe generik dengan pembatalan timer otomatis.',
+      },
+    },
+    {
+      id: 'js',
+      label: 'Vanilla JS',
+      language: 'js',
+      bad: {
+        code: `document.getElementById('search-box').addEventListener('input', (event) => {
+  fetch('/api/search?q=' + encodeURIComponent(event.target.value))
+    .then((res) => res.json())
+    .then((data) => updateUI(data));
+});`,
+        caption: 'Buruk: Membebani server dengan request jaringan bertubi-tubi di setiap ketukan.',
+      },
+      good: {
+        code: `function debounce(callback, delayMs = 350) {
+  let timerId;
+  return function (...args) {
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      callback.apply(this, args);
+    }, delayMs);
+  };
+}
+
+const performSearch = debounce((query) => {
+  fetch('/api/search?q=' + encodeURIComponent(query))
+    .then((res) => res.json())
+    .then((data) => updateUI(data));
+}, 350);
+
+document.getElementById('search-box').addEventListener('input', (event) => {
+  performSearch(event.target.value);
+});`,
+        caption: 'Baik: Menggunakan closure setTimeout sederhana untuk membatalkan timer sebelumnya.',
+      },
+    },
+    {
+      id: 'react',
+      label: 'React Hook',
+      language: 'ts',
+      bad: {
+        code: `function SearchComponent() {
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    if (query) {
+      fetchSearchResults(query);
+    }
+  }, [query]);
+
+  return <input value={query} onChange={(e) => setQuery(e.target.value)} />;
+}`,
+        caption: 'Buruk: useEffect langsung mengeksekusi request setiap kali query diperbarui.',
+      },
+      good: {
+        code: `function useDebounce<T>(value: T, delayMs: number = 350): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delayMs);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delayMs]);
+
+  return debouncedValue;
+}
+
+function SearchComponent() {
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 350);
+
+  useEffect(() => {
+    if (debouncedQuery) {
+      fetchSearchResults(debouncedQuery);
+    }
+  }, [debouncedQuery]);
+
+  return <input value={query} onChange={(e) => setQuery(e.target.value)} />;
+}`,
+        caption: 'Baik: Custom hook useDebounce dengan cleanup function untuk membatalkan timer saat render ulang.',
+      },
+    },
+  ]}
 />
 
 ## Uji Pemahaman

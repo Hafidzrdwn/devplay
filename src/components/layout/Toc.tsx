@@ -17,6 +17,16 @@ interface TocProps {
 export function Toc({ headings, lang }: TocProps): React.JSX.Element | null {
   const [activeSlug, setActiveSlug] = React.useState<string>(headings[0]?.slug ?? '');
   const t = useTranslations(lang);
+  const isClickScrollingRef = React.useRef<boolean>(false);
+  const clickTimeoutRef = React.useRef<number | null>(null);
+
+  React.useEffect(() => {
+    return () => {
+      if (clickTimeoutRef.current !== null) {
+        window.clearTimeout(clickTimeoutRef.current);
+      }
+    };
+  }, []);
 
   React.useEffect(() => {
     if (headings.length === 0) {
@@ -25,6 +35,9 @@ export function Toc({ headings, lang }: TocProps): React.JSX.Element | null {
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (isClickScrollingRef.current) {
+          return;
+        }
         for (const entry of entries) {
           if (entry.isIntersecting) {
             setActiveSlug(entry.target.id);
@@ -60,9 +73,19 @@ export function Toc({ headings, lang }: TocProps): React.JSX.Element | null {
     event.preventDefault();
     const targetElement = document.getElementById(slug);
     if (targetElement) {
+      isClickScrollingRef.current = true;
+      setActiveSlug(slug);
+
+      if (clickTimeoutRef.current !== null) {
+        window.clearTimeout(clickTimeoutRef.current);
+      }
+      clickTimeoutRef.current = window.setTimeout(() => {
+        isClickScrollingRef.current = false;
+        clickTimeoutRef.current = null;
+      }, 800);
+
       targetElement.scrollIntoView({ behavior: 'smooth' });
       window.history.pushState(null, '', `#${slug}`);
-      setActiveSlug(slug);
     }
   };
 

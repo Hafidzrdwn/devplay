@@ -13,6 +13,7 @@ import Callout from '@/components/mdx/Callout.astro';
 import CodeCompare from '@/components/mdx/CodeCompare';
 import QuickCheck from '@/components/mdx/QuickCheck';
 import DebouncingSim from '@/components/simulations/frontend/debouncing/Debouncing';
+import DebounceSearchPlayground from '@/components/simulations/frontend/debouncing/DebounceSearchPlayground';
 
 Have you ever typed a query into a search bar, only to notice the interface stutter because the backend was inundated with dozens of network requests on every single keystroke? This classic frontend bottleneck happens when event listeners trigger compute-heavy actions too eagerly during rapid bursts of user activity.
 
@@ -41,6 +42,8 @@ Debouncing is ideal whenever your application only cares about the final settled
 - **Window Resize Handlers**: Recalculates complex viewport layouts or canvas dimensions only after the user has finished adjusting their browser window.
 - **Username Availability Checks**: Queries backend database indexes to verify name uniqueness only when the user finishes filling in the registration field.
 
+<DebounceSearchPlayground client:idle lang="en" />
+
 ## Trade-offs
 
 While debouncing drastically curbs redundant network traffic and main thread thrashing, it introduces an inherent intentional latency.
@@ -60,9 +63,13 @@ The robust approach wraps the target handler in a typed generic debounce utility
 <CodeCompare
   client:visible
   lang="en"
-  language="ts"
-  bad={{
-    code: `function initSearchInput(inputElement: HTMLInputElement) {
+  examples={[
+    {
+      id: 'ts',
+      label: 'TypeScript',
+      language: 'ts',
+      bad: {
+        code: `function initSearchInput(inputElement: HTMLInputElement) {
   inputElement.addEventListener('input', async (event) => {
     const target = event.target as HTMLInputElement;
     const query = target.value;
@@ -71,10 +78,10 @@ The robust approach wraps the target handler in a typed generic debounce utility
     renderSearchResults(results);
   });
 }`,
-    caption: 'Bad: Network request dispatched on every single keystroke with zero throttling.',
-  }}
-  good={{
-    code: `function debounce<Args extends unknown[]>(
+        caption: 'Bad: Network request dispatched on every single keystroke with zero throttling.',
+      },
+      good: {
+        code: `function debounce<Args extends unknown[]>(
   targetFunction: (...args: Args) => void,
   delayMs: number
 ): (...args: Args) => void {
@@ -102,8 +109,95 @@ function initSearchInput(inputElement: HTMLInputElement) {
     debouncedFetch(target.value);
   });
 }`,
-    caption: 'Good: Uses a generic typed debounce utility with automatic timer cancellation.',
-  }}
+        caption: 'Good: Uses a generic typed debounce utility with automatic timer cancellation.',
+      },
+    },
+    {
+      id: 'js',
+      label: 'Vanilla JS',
+      language: 'js',
+      bad: {
+        code: `document.getElementById('search-box').addEventListener('input', (event) => {
+  fetch('/api/search?q=' + encodeURIComponent(event.target.value))
+    .then((res) => res.json())
+    .then((data) => updateUI(data));
+});`,
+        caption: 'Bad: Floods backend with redundant HTTP requests on every keypress.',
+      },
+      good: {
+        code: `function debounce(callback, delayMs = 350) {
+  let timerId;
+  return function (...args) {
+    clearTimeout(timerId);
+    timerId = setTimeout(() => {
+      callback.apply(this, args);
+    }, delayMs);
+  };
+}
+
+const performSearch = debounce((query) => {
+  fetch('/api/search?q=' + encodeURIComponent(query))
+    .then((res) => res.json())
+    .then((data) => updateUI(data));
+}, 350);
+
+document.getElementById('search-box').addEventListener('input', (event) => {
+  performSearch(event.target.value);
+});`,
+        caption: 'Good: Uses a clean setTimeout closure to abort prior pending timers.',
+      },
+    },
+    {
+      id: 'react',
+      label: 'React Hook',
+      language: 'ts',
+      bad: {
+        code: `function SearchComponent() {
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    if (query) {
+      fetchSearchResults(query);
+    }
+  }, [query]);
+
+  return <input value={query} onChange={(e) => setQuery(e.target.value)} />;
+}`,
+        caption: 'Bad: useEffect executes immediately on every keystroke state change.',
+      },
+      good: {
+        code: `function useDebounce<T>(value: T, delayMs: number = 350): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delayMs);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delayMs]);
+
+  return debouncedValue;
+}
+
+function SearchComponent() {
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 350);
+
+  useEffect(() => {
+    if (debouncedQuery) {
+      fetchSearchResults(debouncedQuery);
+    }
+  }, [debouncedQuery]);
+
+  return <input value={query} onChange={(e) => setQuery(e.target.value)} />;
+}`,
+        caption: 'Good: Custom useDebounce hook with cleanup function cancelling timers on re-render.',
+      },
+    },
+  ]}
 />
 
 ## Quick Check
