@@ -167,7 +167,7 @@ function validateMdxFile(
     errors.push(`minimal 5 heading h2 diperlukan (ditemukan ${h2Count})`);
   }
 
-  const langPropRegex = /\blang=(?:["']([^"']+)["']|\{["']([^"']+)["']\})/g;
+  const langPropRegex = /<[A-Z]\w+[^>]*\blang=(?:["']([^"']+)["']|\{["']([^"']+)["']\})/g;
   let langMatch: RegExpExecArray | null = langPropRegex.exec(bodyContent);
 
   while (langMatch !== null) {

@@ -197,6 +197,58 @@ function SearchComponent() {
         caption: 'Good: Custom useDebounce hook with cleanup function cancelling timers on re-render.',
       },
     },
+    {
+      id: 'vue',
+      label: 'Vue 3 Composable',
+      language: 'ts',
+      bad: {
+        code: `<script setup lang="ts">
+import { ref, watch } from 'vue';
+
+const query = ref('');
+
+watch(query, (newQuery) => {
+  if (newQuery) {
+    fetchSearchResults(newQuery);
+  }
+});
+</script>
+
+<template>
+  <input v-model="query" placeholder="Search data..." />
+</template>`,
+        caption: 'Bad: Reactive watcher triggers network requests immediately on every keystroke mutation.',
+      },
+      good: {
+        code: `<script setup lang="ts">
+import { ref, customRef } from 'vue';
+
+function useDebouncedRef<T>(value: T, delayMs: number = 350) {
+  let timeout: ReturnType<typeof setTimeout>;
+  return customRef((track, trigger) => ({
+    get() {
+      track();
+      return value;
+    },
+    set(newValue: T) {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        value = newValue;
+        trigger();
+      }, delayMs);
+    },
+  }));
+}
+
+const query = useDebouncedRef('', 350);
+</script>
+
+<template>
+  <input v-model="query" placeholder="Search data..." />
+</template>`,
+        caption: 'Good: Native customRef implementation debounces reactive mutations at the source.',
+      },
+    },
   ]}
 />
 

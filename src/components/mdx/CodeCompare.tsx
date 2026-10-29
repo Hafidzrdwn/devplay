@@ -254,12 +254,41 @@ export function CodeCompare({
       return null;
     }
 
+    if (normalizedExamples.length > 3) {
+      return (
+        <div className="inline-flex items-center gap-2">
+          <span className="text-xs font-mono font-bold text-muted uppercase tracking-wider hidden sm:inline">
+            {lang === 'id' ? 'Bahasa:' : 'Language:'}
+          </span>
+          <div className="relative inline-flex items-center">
+            <select
+              value={currentExample.id}
+              onChange={(e) => setSelectedExampleId(e.target.value)}
+              aria-label={lang === 'id' ? 'Pilih varian bahasa' : 'Select language variant'}
+              className="appearance-none h-8.5 rounded-card border-2 border-ink bg-surface pl-3 pr-8 text-xs font-mono font-bold text-ink shadow-[2px_2px_0_0_var(--ink)] cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary hover:bg-bg transition-colors"
+            >
+              {normalizedExamples.map((ex) => (
+                <option key={ex.id} value={ex.id} className="bg-surface text-ink font-mono text-xs">
+                  {ex.label}
+                </option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-ink">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14" aria-hidden="true">
+                <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div className="flex items-center gap-1.5 flex-wrap">
+      <div className="inline-flex items-center gap-2">
         <span className="text-xs font-mono font-bold text-muted uppercase tracking-wider hidden sm:inline">
           {lang === 'id' ? 'Bahasa:' : 'Language:'}
         </span>
-        <div className="inline-flex rounded-lg border-2 border-ink bg-surface p-1 shadow-[2px_2px_0_0_var(--ink)] gap-1">
+        <div className="inline-flex items-center h-8.5 rounded-card border-2 border-ink bg-surface p-0.5 shadow-[2px_2px_0_0_var(--ink)] gap-1">
           {normalizedExamples.map((ex) => {
             const isSelected = ex.id === currentExample.id;
             return (
@@ -268,9 +297,9 @@ export function CodeCompare({
                 type="button"
                 onClick={() => setSelectedExampleId(ex.id)}
                 className={cn(
-                  'inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-mono font-bold transition-all cursor-pointer',
+                  'inline-flex items-center h-7 px-2.5 rounded text-xs font-mono font-bold transition-all cursor-pointer',
                   isSelected
-                    ? 'bg-accent text-accent-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
+                    ? 'bg-accent text-accent-ink border border-ink shadow-[1px_1px_0_0_var(--ink)]'
                     : 'text-muted hover:text-ink hover:bg-bg/60'
                 )}
               >
@@ -285,23 +314,23 @@ export function CodeCompare({
 
   return (
     <div className={cn('my-6 w-full min-w-0', className)}>
-      <div className="flex flex-wrap items-center justify-between gap-2.5 mb-3 select-none">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-3 select-none">
         <div className="flex items-center gap-2.5 flex-wrap">
           {renderLanguageSelector()}
 
           {layout === 'tab' ? (
-            <div className="inline-flex rounded-lg border-2 border-ink bg-surface p-1 shadow-[2px_2px_0_0_var(--ink)] gap-1">
+            <div className="inline-flex items-center h-8.5 rounded-card border-2 border-ink bg-surface p-0.5 shadow-[2px_2px_0_0_var(--ink)] gap-1">
               <button
                 type="button"
                 onClick={() => setActiveTab('bad')}
                 className={cn(
-                  'inline-flex items-center gap-2 px-3 py-1.5 rounded text-xs sm:text-sm font-mono font-bold transition-all cursor-pointer',
+                  'inline-flex items-center gap-1.5 h-7 px-3 rounded text-xs font-mono font-bold transition-all cursor-pointer',
                   activeTab === 'bad'
-                    ? 'bg-danger text-danger-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
+                    ? 'bg-danger text-danger-ink border border-ink shadow-[1px_1px_0_0_var(--ink)]'
                     : 'text-muted hover:text-ink hover:bg-bg/60'
                 )}
               >
-                <MascotSvg crew="bug" mood="confused" size={18} variant="head" />
+                <MascotSvg crew="bug" mood="confused" size={16} variant="head" />
                 <span>{t('code.bad')}</span>
               </button>
 
@@ -309,24 +338,24 @@ export function CodeCompare({
                 type="button"
                 onClick={() => setActiveTab('good')}
                 className={cn(
-                  'inline-flex items-center gap-2 px-3 py-1.5 rounded text-xs sm:text-sm font-mono font-bold transition-all cursor-pointer',
+                  'inline-flex items-center gap-1.5 h-7 px-3 rounded text-xs font-mono font-bold transition-all cursor-pointer',
                   activeTab === 'good'
-                    ? 'bg-success text-success-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
+                    ? 'bg-success text-success-ink border border-ink shadow-[1px_1px_0_0_var(--ink)]'
                     : 'text-muted hover:text-ink hover:bg-bg/60'
                 )}
               >
-                <MascotSvg crew="dev" mood="happy" size={18} variant="head" />
+                <MascotSvg crew="dev" mood="happy" size={16} variant="head" />
                 <span>{t('code.good')}</span>
               </button>
             </div>
           ) : (
-            <div className="text-xs font-mono font-bold uppercase tracking-wider text-muted">
+            <div className="inline-flex items-center h-8.5 px-2 text-xs font-mono font-bold uppercase tracking-wider text-muted">
               {lang === 'id' ? 'Tampilan Bertumpuk' : 'Stacked View'}
             </div>
           )}
         </div>
 
-        <div className="inline-flex rounded-lg border-2 border-ink bg-surface p-1 shadow-[2px_2px_0_0_var(--ink)] gap-1 ml-auto">
+        <div className="inline-flex items-center h-8.5 rounded-card border-2 border-ink bg-surface p-0.5 shadow-[2px_2px_0_0_var(--ink)] gap-1 self-start sm:self-auto sm:ml-auto">
           <button
             type="button"
             onClick={() => setLayout('tab')}
@@ -335,7 +364,7 @@ export function CodeCompare({
             className={cn(
               'inline-flex items-center justify-center size-7 rounded text-xs font-mono font-bold transition-all cursor-pointer',
               layout === 'tab'
-                ? 'bg-accent text-accent-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
+                ? 'bg-accent text-accent-ink border border-ink shadow-[1px_1px_0_0_var(--ink)]'
                 : 'text-muted hover:text-ink hover:bg-bg/60'
             )}
           >
@@ -363,7 +392,7 @@ export function CodeCompare({
             className={cn(
               'inline-flex items-center justify-center size-7 rounded text-xs font-mono font-bold transition-all cursor-pointer',
               layout === 'stack'
-                ? 'bg-accent text-accent-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
+                ? 'bg-accent text-accent-ink border border-ink shadow-[1px_1px_0_0_var(--ink)]'
                 : 'text-muted hover:text-ink hover:bg-bg/60'
             )}
           >
@@ -388,7 +417,7 @@ export function CodeCompare({
             onClick={() => setIsModalOpen(true)}
             aria-label={lang === 'id' ? 'Buka komparasi layar penuh' : 'Open fullscreen comparison'}
             title={lang === 'id' ? 'Komparasi Berdampingan (Layar Penuh)' : 'Side-by-Side (Fullscreen Modal)'}
-            className="inline-flex items-center gap-1.5 px-2 h-7 rounded text-xs font-mono font-bold transition-all cursor-pointer text-muted hover:text-ink hover:bg-bg/60"
+            className="inline-flex items-center gap-1.5 px-2.5 h-7 rounded text-xs font-mono font-bold transition-all cursor-pointer text-muted hover:text-ink hover:bg-bg/60"
           >
             <svg
               viewBox="0 0 24 24"

@@ -48,7 +48,7 @@ export function DebounceSearchPlayground({
       });
 
       setLogs((prev) => [
-        `[${timestamp}] 🚀 API GET /search?q=${encodeURIComponent(query)} (200 OK)`,
+        `[${timestamp}] [200 OK] GET /search?q=${encodeURIComponent(query)}`,
         ...prev.slice(0, 5),
       ]);
 
@@ -83,12 +83,12 @@ export function DebounceSearchPlayground({
     if (timerRef.current !== null) {
       window.clearTimeout(timerRef.current);
       setLogs((prev) => [
-        `[${timestamp}] ⏱️ Reset: input '${value}' (timer lama dibatalkan)`,
+        `[${timestamp}] [ABORT] Input '${value}' -> timer reset`,
         ...prev.slice(0, 5),
       ]);
     } else {
       setLogs((prev) => [
-        `[${timestamp}] ⏳ Mulai timer: input '${value}' (${delayMs}ms)`,
+        `[${timestamp}] [TIMER] Input '${value}' -> timer started (${delayMs}ms)`,
         ...prev.slice(0, 5),
       ]);
     }
@@ -243,10 +243,12 @@ export function DebounceSearchPlayground({
                   {results.map((item) => (
                     <li
                       key={item.id}
-                      className="rounded border border-ink/20 bg-bg/40 px-2.5 py-1.5 text-xs text-ink flex items-center justify-between"
+                      className="w-full flex items-center justify-between gap-3 p-2.5 rounded border border-ink/20 bg-bg/40 min-w-0"
                     >
-                      <span className="font-semibold">{item.title}</span>
-                      <span className="text-[10px] font-mono text-muted uppercase">
+                      <span className="truncate min-w-0 flex-1 font-semibold text-xs text-ink">
+                        {item.title}
+                      </span>
+                      <span className="shrink-0 rounded border border-ink/30 bg-surface px-1.5 py-0.5 text-[9px] font-mono font-bold text-muted uppercase shadow-[1px_1px_0_0_var(--ink)]">
                         {item.category}
                       </span>
                     </li>

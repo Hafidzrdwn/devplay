@@ -656,6 +656,18 @@ Akhir setiap step di Dokumen 2 memuat tepat satu baris `git commit -m '...'` ber
 
 `pnpm astro check` (tanpa error TS), `pnpm check:comments`, `pnpm build` (khusus step yang menyentuh rute, konten, atau API). Target performa halaman artikel tanpa simulasi 3D: Lighthouse Performance ≥ 95, JS awal ≤ 60 KB gzip.
 
+### 7.4 Multi-Language & Framework Code Comparison (Adaptive Selector)
+
+- Setiap konsep wajib menyajikan komparasi kode (Praktik Buruk vs Baik) yang disesuaikan secara dinamis dengan domain materi (misal frontend: TypeScript, Vanilla JS, React Hook, Vue Composable, Svelte, Angular; backend: Go, Rust, Python, Java, SQL, bash).
+- **Aturan UX Selector Adaptif**:
+  - Jika jumlah varian bahasa/framework $\le 3$, tampilkan tombol pills horizontal neobrutalist.
+  - Jika jumlah varian $> 3$, otomatis beralih menjadi `<select>` dropdown neobrutalist agar responsif dan tidak memadati toolbar.
+
+### 7.5 Real-World Simulation Playground & Zero-Emoji Logging
+
+- Setiap materi disarankan melengkapi visualisasi 2D/3D konseptual dengan playground interaktif berbasis skenario nyata (misal debouncing dengan input autocomplete live dan perbandingan jumlah request jaringan).
+- **Zero-Emoji Policy**: Log terminal dan simulasi jaringan dilarang keras memakai emoticon Unicode (`🚀`, `⏱️`, `⏳`). Gunakan tag teknis monospaced bracketed (seperti `[200 OK]`, `[ABORT]`, `[TIMER]`).
+
 ## 8. DevPlay Crew — Maskot & Karakter
 
 Web diisi 10 karakter blocky (kepala kubus, badan sederhana, aksesori sesuai role) yang menemani pembaca: memandu di landing, menjadi narator simulasi, bertanya di kuis, dan muncul di state kosong atau error. Arah visualnya terinspirasi tim karakter voxel dari referensi yang kamu kirim, tetapi semua desain dibuat original, bukan menyalin karakter siapa pun.

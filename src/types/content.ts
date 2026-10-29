@@ -117,7 +117,24 @@ export interface SimulationContainerProps {
   className?: string;
 }
 
-export type CodeLanguage = 'ts' | 'js' | 'sql' | 'json' | 'bash' | 'html';
+export type CodeLanguage =
+  | 'ts'
+  | 'js'
+  | 'python'
+  | 'go'
+  | 'rust'
+  | 'java'
+  | 'cpp'
+  | 'csharp'
+  | 'php'
+  | 'ruby'
+  | 'sql'
+  | 'json'
+  | 'bash'
+  | 'html'
+  | 'css'
+  | 'yaml'
+  | (string & {});
 
 export interface CodeSample {
   code: string;
