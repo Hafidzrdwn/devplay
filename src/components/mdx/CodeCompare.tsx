@@ -5,7 +5,7 @@ import { cn } from '@/lib/cn';
 import { highlightCode, type HighlightLanguage } from '@/lib/highlight';
 import type { CodeCompareProps, CodeSample } from '@/types/content';
 
-type LayoutMode = 'tab' | 'stack' | 'split';
+type LayoutMode = 'tab' | 'stack';
 type ActiveTab = 'bad' | 'good';
 
 export function CodeCompare({
@@ -21,6 +21,7 @@ export function CodeCompare({
   const [badHtml, setBadHtml] = React.useState<string | null>(null);
   const [goodHtml, setGoodHtml] = React.useState<string | null>(null);
   const [copiedType, setCopiedType] = React.useState<'bad' | 'good' | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     let isMounted = true;
@@ -41,6 +42,27 @@ export function CodeCompare({
       isMounted = false;
     };
   }, [bad.code, good.code, language]);
+
+  React.useEffect(() => {
+    if (!isModalOpen) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsModalOpen(false);
+      }
+    };
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isModalOpen]);
 
   const handleCopy = React.useCallback(async (type: 'bad' | 'good') => {
     const textToCopy = type === 'bad' ? bad.code : good.code;
@@ -70,13 +92,13 @@ export function CodeCompare({
     return (
       <div
         className={cn(
-          'nb-card flex flex-col rounded-card border-2 bg-surface shadow-hard overflow-hidden w-full transition-all',
+          'nb-card flex flex-col rounded-card border-2 bg-surface shadow-hard overflow-hidden w-full min-w-0 transition-all',
           borderClass
         )}
       >
         <div
           className={cn(
-            'flex items-center justify-between border-b-2 px-4 py-2.5 select-none',
+            'flex items-center justify-between border-b-2 px-4 py-2.5 select-none shrink-0',
             borderClass,
             headerBgClass
           )}
@@ -144,21 +166,23 @@ export function CodeCompare({
           </div>
         </div>
 
-        <div className="flex-1 min-h-35 bg-bg/25">
+        <div className="flex-1 min-h-35 bg-bg/25 min-w-0 overflow-hidden flex flex-col justify-stretch">
           {html ? (
             <div
-              className="p-4 sm:p-5 overflow-x-auto text-xs sm:text-sm font-mono leading-relaxed [&>pre]:m-0 [&>pre]:bg-transparent [&>pre]:p-0 [&>pre]:font-mono [&>pre]:text-xs sm:[&>pre]:text-sm [&>pre]:leading-relaxed"
+              className="nb-code-clean flex-1 p-4 sm:p-5 overflow-x-auto nb-scrollbar text-xs sm:text-sm font-mono leading-relaxed min-w-0 [&>pre]:m-0 [&>pre]:bg-transparent! [&>pre]:p-0 [&>pre]:font-mono [&>pre]:text-xs sm:[&>pre]:text-sm [&>pre]:leading-relaxed [&>pre]:min-w-full [&>pre]:w-max"
               dangerouslySetInnerHTML={{ __html: html }}
             />
           ) : (
-            <pre className="p-4 sm:p-5 overflow-x-auto text-xs sm:text-sm font-mono leading-relaxed m-0 text-ink bg-transparent whitespace-pre">
-              <code>{sample.code}</code>
-            </pre>
+            <div className="flex-1 p-4 sm:p-5 overflow-x-auto nb-scrollbar text-xs sm:text-sm font-mono leading-relaxed min-w-0">
+              <pre className="m-0 text-ink bg-transparent whitespace-pre font-mono text-xs sm:text-sm leading-relaxed min-w-full w-max">
+                <code>{sample.code}</code>
+              </pre>
+            </div>
           )}
         </div>
 
         {sample.caption && (
-          <div className="border-t-2 border-ink/15 bg-bg/50 px-4 py-2.5 text-xs sm:text-sm leading-relaxed text-ink/85 font-sans">
+          <div className="border-t-2 border-ink/15 bg-bg/50 px-4 py-2.5 text-xs sm:text-sm leading-relaxed text-ink/85 font-sans shrink-0">
             {sample.caption}
           </div>
         )}
@@ -167,7 +191,7 @@ export function CodeCompare({
   };
 
   return (
-    <div className={cn('my-6 w-full', className)}>
+    <div className={cn('my-6 w-full min-w-0', className)}>
       <div className="flex flex-wrap items-center justify-between gap-2.5 mb-3 select-none">
         {layout === 'tab' ? (
           <div className="inline-flex rounded-lg border-2 border-ink bg-surface p-1 shadow-[2px_2px_0_0_var(--ink)] gap-1">
@@ -177,7 +201,7 @@ export function CodeCompare({
               className={cn(
                 'inline-flex items-center gap-2 px-3 py-1.5 rounded text-xs sm:text-sm font-mono font-bold transition-all cursor-pointer',
                 activeTab === 'bad'
-                  ? 'bg-danger text-white border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
+                  ? 'bg-danger text-danger-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
                   : 'text-muted hover:text-ink hover:bg-bg/60'
               )}
             >
@@ -191,7 +215,7 @@ export function CodeCompare({
               className={cn(
                 'inline-flex items-center gap-2 px-3 py-1.5 rounded text-xs sm:text-sm font-mono font-bold transition-all cursor-pointer',
                 activeTab === 'good'
-                  ? 'bg-success text-white border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
+                  ? 'bg-success text-success-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
                   : 'text-muted hover:text-ink hover:bg-bg/60'
               )}
             >
@@ -201,7 +225,7 @@ export function CodeCompare({
           </div>
         ) : (
           <div className="text-xs font-mono font-bold uppercase tracking-wider text-muted">
-            {layout === 'stack' ? 'Tampilan Bertumpuk' : 'Tampilan Berdampingan'}
+            {lang === 'id' ? 'Tampilan Bertumpuk' : 'Stacked View'}
           </div>
         )}
 
@@ -209,8 +233,8 @@ export function CodeCompare({
           <button
             type="button"
             onClick={() => setLayout('tab')}
-            aria-label="Tab view"
-            title="Tampilan Tab (Fokus)"
+            aria-label={lang === 'id' ? 'Tampilan Tab' : 'Tab view'}
+            title={lang === 'id' ? 'Tampilan Tab (Fokus)' : 'Tab View (Focused)'}
             className={cn(
               'inline-flex items-center justify-center size-7 rounded text-xs font-mono font-bold transition-all cursor-pointer',
               layout === 'tab'
@@ -237,8 +261,8 @@ export function CodeCompare({
           <button
             type="button"
             onClick={() => setLayout('stack')}
-            aria-label="Stacked view"
-            title="Tampilan Bertumpuk (Atas-Bawah)"
+            aria-label={lang === 'id' ? 'Tampilan Bertumpuk' : 'Stacked view'}
+            title={lang === 'id' ? 'Tampilan Bertumpuk (Atas-Bawah)' : 'Stacked View (Top-Bottom)'}
             className={cn(
               'inline-flex items-center justify-center size-7 rounded text-xs font-mono font-bold transition-all cursor-pointer',
               layout === 'stack'
@@ -264,15 +288,10 @@ export function CodeCompare({
 
           <button
             type="button"
-            onClick={() => setLayout('split')}
-            aria-label="Side-by-side view"
-            title="Tampilan Berdampingan"
-            className={cn(
-              'hidden sm:inline-flex items-center justify-center size-7 rounded text-xs font-mono font-bold transition-all cursor-pointer',
-              layout === 'split'
-                ? 'bg-accent text-accent-ink border border-ink shadow-[1px_1px_0_0_var(--ink)] -translate-x-px -translate-y-px'
-                : 'text-muted hover:text-ink hover:bg-bg/60'
-            )}
+            onClick={() => setIsModalOpen(true)}
+            aria-label={lang === 'id' ? 'Buka komparasi layar penuh' : 'Open fullscreen comparison'}
+            title={lang === 'id' ? 'Komparasi Berdampingan (Layar Penuh)' : 'Side-by-Side (Fullscreen Modal)'}
+            className="inline-flex items-center gap-1.5 px-2 h-7 rounded text-xs font-mono font-bold transition-all cursor-pointer text-muted hover:text-ink hover:bg-bg/60"
           >
             <svg
               viewBox="0 0 24 24"
@@ -285,30 +304,88 @@ export function CodeCompare({
               strokeLinejoin="round"
               aria-hidden="true"
             >
-              <rect x="3" y="3" width="7" height="18" rx="2" />
-              <rect x="14" y="3" width="7" height="18" rx="2" />
+              <path d="M15 3h6v6" />
+              <path d="M9 21H3v-6" />
+              <path d="M21 3l-7 7" />
+              <path d="M3 21l7-7" />
             </svg>
+            <span className="hidden sm:inline text-[11px]">
+              {lang === 'id' ? 'Fullscreen' : 'Fullscreen'}
+            </span>
           </button>
         </div>
       </div>
 
       {layout === 'tab' && (
-        <div className="w-full">
+        <div className="w-full min-w-0">
           {activeTab === 'bad' ? renderPanel('bad') : renderPanel('good')}
         </div>
       )}
 
       {layout === 'stack' && (
-        <div className="flex flex-col gap-5 w-full">
+        <div className="flex flex-col gap-5 w-full min-w-0">
           {renderPanel('bad')}
           {renderPanel('good')}
         </div>
       )}
 
-      {layout === 'split' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 items-stretch w-full xl:-mx-8 2xl:-mx-16 xl:w-[calc(100%+4rem)] 2xl:w-[calc(100%+8rem)]">
-          {renderPanel('bad')}
-          {renderPanel('good')}
+      {isModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={lang === 'id' ? 'Komparasi Kode Layar Penuh' : 'Fullscreen Code Comparison'}
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 lg:p-8 bg-bg/85 backdrop-blur-sm animate-in fade-in duration-150"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              setIsModalOpen(false);
+            }
+          }}
+        >
+          <div className="relative flex flex-col w-full max-w-7xl h-[92vh] max-h-240 rounded-card border-2 border-ink bg-surface shadow-[8px_8px_0_0_var(--ink)] overflow-hidden">
+            <div className="flex items-center justify-between border-b-2 border-ink bg-surface px-4 sm:px-6 py-3 select-none shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="inline-flex items-center rounded border border-ink bg-accent px-2 py-0.5 text-xs font-mono font-bold text-accent-ink uppercase shadow-[1px_1px_0_0_var(--ink)]">
+                  {language}
+                </span>
+                <span className="font-heading font-bold text-base sm:text-lg text-ink truncate">
+                  {lang === 'id' ? 'Komparasi Praktik: Buruk vs Baik' : 'Code Comparison: Bad vs Good'}
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                aria-label={lang === 'id' ? 'Tutup komparasi layar penuh' : 'Close fullscreen comparison'}
+                className="inline-flex items-center gap-1.5 rounded-card border-2 border-ink bg-bg px-3 py-1.5 text-xs font-mono font-bold text-ink shadow-[2px_2px_0_0_var(--ink)] hover:-translate-x-px hover:-translate-y-px hover:shadow-[3px_3px_0_0_var(--ink)] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none transition-all cursor-pointer"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  width="14"
+                  height="14"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+                <span>{lang === 'id' ? 'Tutup' : 'Close'}</span>
+                <kbd className="hidden sm:inline-block px-1 py-0.5 text-[10px] rounded bg-surface border border-ink/40 text-muted shadow-[1px_1px_0_0_var(--ink)]">
+                  ESC
+                </kbd>
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 nb-scrollbar min-w-0">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6 items-stretch min-w-0">
+                {renderPanel('bad')}
+                {renderPanel('good')}
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>

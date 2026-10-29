@@ -60,7 +60,7 @@ const tocHeadings: TocHeading[] = headings
     />
   </div>
 
-  <div class="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
+  <div class="mx-auto max-w-7xl px-3 sm:px-6 py-6 sm:py-8">
     <div class="lg:hidden mb-6 flex items-center justify-between gap-4 border-b-2 border-ink pb-4">
       <SidebarDrawer lang={lang} client:media="(max-width: 1023px)">
         <div data-pagefind-ignore>
@@ -72,7 +72,7 @@ const tocHeadings: TocHeading[] = headings
       </span>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)_240px] gap-8 items-start">
+    <div class="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] xl:grid-cols-[280px_minmax(0,1fr)_250px] gap-8 items-start">
       <aside class="hidden lg:block w-72 shrink-0 sticky top-24 self-start max-h-[calc(100vh-7rem)] overflow-y-auto nb-scrollbar pr-2 pb-6" data-pagefind-ignore>
         <slot name="sidebar">
           <Sidebar lang={lang} currentCategory={category} currentSlug={slug} />
@@ -111,7 +111,7 @@ const tocHeadings: TocHeading[] = headings
         </slot>
       </main>
 
-      <aside class="hidden xl:block w-64 shrink-0 sticky top-24 self-start pb-6" data-pagefind-ignore>
+      <aside class="hidden xl:block w-full sticky top-24 self-start pb-6" data-pagefind-ignore>
         <slot name="toc">
           <Toc headings={tocHeadings} lang={lang} client:idle />
         </slot>

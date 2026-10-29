@@ -58,7 +58,7 @@ export function SimulationContainer({
 
   const kindBadgeClass =
     kind === '3d'
-      ? 'bg-primary text-white dark:text-ink'
+      ? 'bg-primary text-white dark:text-accent-ink'
       : 'bg-accent text-accent-ink';
 
   return (

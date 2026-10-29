@@ -353,7 +353,7 @@ export function Debouncing({ lang }: SimulationProps): React.JSX.Element {
 
               <rect width="680" height="230" fill="url(#debounce-grid)" />
 
-              <g transform="translate(16, 20)">
+              <g transform="translate(16, 12)">
                 <rect
                   x="0"
                   y="0"
@@ -374,9 +374,9 @@ export function Debouncing({ lang }: SimulationProps): React.JSX.Element {
 
               <line
                 x1="120"
-                y1="68"
+                y1="70"
                 x2="540"
-                y2="68"
+                y2="70"
                 className="stroke-ink/40"
                 strokeWidth="2"
                 strokeDasharray="4 4"
@@ -385,10 +385,10 @@ export function Debouncing({ lang }: SimulationProps): React.JSX.Element {
               <MascotSvg
                 crew="intern"
                 mood={state.isInternTyping ? 'happy' : 'idle'}
-                embed={{ x: 14, y: 34, scale: 0.44 }}
+                embed={{ x: 16, y: 46, scale: 0.42 }}
               />
 
-              <g transform="translate(74, 52)">
+              <g transform="translate(74, 56)">
                 <rect
                   x="0"
                   y="0"
@@ -411,14 +411,14 @@ export function Debouncing({ lang }: SimulationProps): React.JSX.Element {
                 >
                   <circle
                     cx={dot.x}
-                    cy="68"
+                    cy="70"
                     r="8"
                     className="fill-accent stroke-ink"
                     strokeWidth="2"
                   />
                   <circle
                     cx={dot.x}
-                    cy="68"
+                    cy="70"
                     r="3"
                     className="fill-accent-ink"
                   />

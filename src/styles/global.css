@@ -11,12 +11,14 @@
   --bg: #fff8ec;
   --surface: #ffffff;
   --ink: #1b1b1f;
-  --muted: #6b6b76;
+  --muted: #52525b;
   --primary: #7c5cff;
   --accent: #ffc933;
   --accent-ink: #14131a;
   --success: #2fbf71;
+  --success-ink: #14131a;
   --danger: #ff5c5c;
+  --danger-ink: #ffffff;
   --info: #3ba7ff;
   --grid: #e7dfce;
   --radius: 14px;
@@ -33,12 +35,14 @@
   --bg: #14131a;
   --surface: #1e1c27;
   --ink: #f5f1e8;
-  --muted: #a19fb0;
+  --muted: #cbd5e1;
   --primary: #a48dff;
   --accent: #ffd65c;
   --accent-ink: #14131a;
   --success: #4ade94;
+  --success-ink: #14131a;
   --danger: #ff7a7a;
+  --danger-ink: #14131a;
   --info: #6bbfff;
   --grid: #2e2b3b;
 
@@ -58,7 +62,9 @@
   --color-accent: var(--accent);
   --color-accent-ink: var(--accent-ink);
   --color-success: var(--success);
+  --color-success-ink: var(--success-ink);
   --color-danger: var(--danger);
+  --color-danger-ink: var(--danger-ink);
   --color-info: var(--info);
   --color-grid: var(--grid);
   --radius-card: var(--radius);
@@ -163,6 +169,11 @@ html.dark .shiki span,
   font-style: var(--shiki-dark-font-style);
   font-weight: var(--shiki-dark-font-weight);
   text-decoration: var(--shiki-dark-text-decoration);
+}
+
+.nb-code-clean pre,
+.nb-code-clean .shiki {
+  background-color: transparent !important;
 }
 
 .nb-range-slider {

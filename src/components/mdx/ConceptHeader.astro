@@ -33,10 +33,10 @@ const categoryMeta = getCategory(category);
 
 const categoryAccentClasses: Record<string, string> = {
   accent: 'bg-accent text-accent-ink',
-  primary: 'bg-primary text-white dark:text-ink',
+  primary: 'bg-primary text-white dark:text-accent-ink',
   info: 'bg-info text-ink',
   success: 'bg-success text-ink',
-  danger: 'bg-danger text-white dark:text-ink',
+  danger: 'bg-danger text-danger-ink',
 };
 
 const difficultyDotColors: Record<Difficulty, string> = {
@@ -80,7 +80,7 @@ const readingText = t('reading.time').replace('{n}', String(readingMinutes));
   </div>
 
   <div class="flex items-center gap-4 sm:gap-5 my-2">
-    <div class="shrink-0 size-[72px] flex items-center justify-center">
+    <div class="shrink-0 size-18 flex items-center justify-center">
       <MascotSvg crew={speaker} size={72} />
     </div>
     <h1
