@@ -9,13 +9,18 @@ import { getCurrentConceptSlug, markConceptCompleted } from '@/stores/progress';
 import type { CrewId, MascotMood, QuickCheckProps } from '@/types/content';
 
 const confettiParticles = [
-  { dx: '-36px', dy: '-32px', rot: '45deg', color: '#ffc933' },
-  { dx: '36px', dy: '-30px', rot: '-35deg', color: '#7c5cff' },
-  { dx: '-24px', dy: '-48px', rot: '60deg', color: '#2fbf71' },
-  { dx: '28px', dy: '-45px', rot: '-50deg', color: '#ff5c5c' },
-  { dx: '-44px', dy: '-12px', rot: '20deg', color: '#3ba7ff' },
-  { dx: '44px', dy: '-16px', rot: '-25deg', color: '#ff7a1a' },
-  { dx: '0px', dy: '-52px', rot: '15deg', color: '#ffd65c' },
+  { dx: '-44px', dy: '-40px', rot: '45deg', color: '#ffc933', delay: '0s' },
+  { dx: '44px', dy: '-38px', rot: '-35deg', color: '#7c5cff', delay: '0.04s' },
+  { dx: '-30px', dy: '-60px', rot: '60deg', color: '#2fbf71', delay: '0.08s' },
+  { dx: '32px', dy: '-58px', rot: '-50deg', color: '#ff5c5c', delay: '0.02s' },
+  { dx: '-52px', dy: '-14px', rot: '20deg', color: '#3ba7ff', delay: '0.06s' },
+  { dx: '52px', dy: '-18px', rot: '-25deg', color: '#ff7a1a', delay: '0.1s' },
+  { dx: '0px', dy: '-68px', rot: '15deg', color: '#ffd65c', delay: '0.05s' },
+  { dx: '-18px', dy: '-48px', rot: '-40deg', color: '#ff7a7a', delay: '0.12s' },
+  { dx: '20px', dy: '-46px', rot: '55deg', color: '#4ade94', delay: '0.09s' },
+  { dx: '-58px', dy: '-32px', rot: '30deg', color: '#a48dff', delay: '0.07s' },
+  { dx: '58px', dy: '-28px', rot: '-45deg', color: '#ffc933', delay: '0.11s' },
+  { dx: '6px', dy: '-76px', rot: '-15deg', color: '#3ba7ff', delay: '0.03s' },
 ];
 
 export function QuickCheck({
@@ -112,6 +117,7 @@ export function QuickCheck({
                   style={
                     {
                       backgroundColor: particle.color,
+                      animationDelay: particle.delay,
                       '--dx': particle.dx,
                       '--dy': particle.dy,
                       '--rot': particle.rot,
@@ -124,9 +130,11 @@ export function QuickCheck({
         </div>
       </div>
 
-      <h3 className="font-heading font-bold text-lg sm:text-xl text-ink text-center mb-6 leading-snug">
-        {question}
-      </h3>
+      <div className="pt-2 pb-6 px-1">
+        <h3 className="font-heading font-bold text-lg sm:text-xl text-ink text-center leading-snug m-0!">
+          {question}
+        </h3>
+      </div>
 
       <div
         role="radiogroup"
@@ -202,8 +210,9 @@ export function QuickCheck({
               </div>
 
               {isAnswered && option.explanation && (
-                <div className="mt-3 pt-3 border-t-2 border-ink/10 font-sans text-xs sm:text-sm leading-relaxed text-ink/80">
-                  {option.explanation}
+                <div className="mt-3 pt-3 border-t-2 border-ink/20 font-sans text-xs sm:text-sm leading-relaxed text-ink">
+                  <span className="font-bold text-ink">{t('quiz.explanation')}: </span>
+                  <span>{option.explanation}</span>
                 </div>
               )}
             </div>

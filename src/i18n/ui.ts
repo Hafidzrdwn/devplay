@@ -19,6 +19,7 @@ const id = {
   'quiz.correct': 'Benar!',
   'quiz.wrong': 'Kurang tepat',
   'quiz.retry': 'Coba lagi',
+  'quiz.explanation': 'Penjelasan',
   'common.soon': 'Segera hadir',
   'search.placeholder': 'Cari konsep, simulasi, atau arsitektur...',
   'search.quick': 'Rekomendasi Konsep',
@@ -31,7 +32,7 @@ const id = {
   'nav.prev': 'Sebelumnya',
   'nav.next': 'Selanjutnya',
   'toc.title': 'Di Halaman Ini',
-  'reading.time': '{n} min',
+  'reading.time': '{n} menit',
 } as const;
 
 export type UiKey = keyof typeof id;
@@ -55,6 +56,7 @@ const en: Record<UiKey, string> = {
   'quiz.correct': 'Correct!',
   'quiz.wrong': 'Incorrect',
   'quiz.retry': 'Try again',
+  'quiz.explanation': 'Explanation',
   'common.soon': 'Coming soon',
   'search.placeholder': 'Search concepts, simulations, or architecture...',
   'search.quick': 'Recommended Concepts',

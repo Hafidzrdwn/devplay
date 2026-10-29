@@ -49,6 +49,20 @@ const enHref = switchLangPath(currentPath, 'en');
 
 <script is:inline>
   (function () {
+    function restoreScrollPosition() {
+      var savedScroll = sessionStorage.getItem('devplay-lang-switch-scroll');
+      if (savedScroll !== null) {
+        sessionStorage.removeItem('devplay-lang-switch-scroll');
+        var ratio = parseFloat(savedScroll);
+        if (!isNaN(ratio)) {
+          requestAnimationFrame(function () {
+            var newScrollMax = document.documentElement.scrollHeight - window.innerHeight;
+            window.scrollTo({ top: ratio * newScrollMax, behavior: 'instant' });
+          });
+        }
+      }
+    }
+
     function setupLanguageSwitcher() {
       var langLinks = document.querySelectorAll('a[data-lang-target]');
       langLinks.forEach(function (link) {
@@ -59,13 +73,12 @@ const enHref = switchLangPath(currentPath, 'en');
           if (targetLang) {
             localStorage.setItem('devplay-lang', targetLang);
           }
-          var currentHash = window.location.hash;
-          if (currentHash) {
-            var destinationHref = link.getAttribute('href') || '';
-            link.setAttribute('href', destinationHref.split('#')[0] + currentHash);
-          }
+          var scrollMax = document.documentElement.scrollHeight - window.innerHeight;
+          var scrollRatio = scrollMax > 0 ? window.scrollY / scrollMax : 0;
+          sessionStorage.setItem('devplay-lang-switch-scroll', String(scrollRatio));
         });
       });
+      restoreScrollPosition();
     }
 
     if (document.readyState === 'loading') {

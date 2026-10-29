@@ -235,3 +235,45 @@ html.dark .shiki span,
   box-shadow: 0 0 0 0 var(--ink);
 }
 
+.nb-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--muted) transparent;
+}
+
+.nb-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.nb-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nb-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--muted);
+  border-radius: 9999px;
+  opacity: 0.6;
+}
+
+.nb-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--ink);
+}
+
+@keyframes reading-progress-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@supports (animation-timeline: scroll()) {
+  .reading-progress-fill {
+    width: 100% !important;
+    transform-origin: 0% 50% !important;
+    animation: reading-progress-grow linear !important;
+    animation-timeline: scroll() !important;
+  }
+}
+

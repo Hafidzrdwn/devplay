@@ -70,7 +70,7 @@ export function Toc({ headings, lang }: TocProps): React.JSX.Element | null {
     <nav
       aria-label={t('toc.title')}
       data-pagefind-ignore
-      className="space-y-2 rounded-card border-2 border-ink bg-surface p-4 shadow-hard text-xs sticky top-24"
+      className="space-y-2 rounded-card border-2 border-ink bg-surface p-4 shadow-hard text-xs"
     >
       <h2 className="font-heading font-bold text-sm text-ink pb-2 border-b-2 border-ink flex items-center justify-between">
         <span>{t('toc.title')}</span>
@@ -91,10 +91,10 @@ export function Toc({ headings, lang }: TocProps): React.JSX.Element | null {
                 href={`#${heading.slug}`}
                 onClick={(event) => handleHeadingClick(event, heading.slug)}
                 className={cn(
-                  'block py-1 px-2 rounded-md transition-all text-left truncate',
+                  'block py-1.5 px-2.5 rounded-lg transition-all text-left truncate',
                   isActive
                     ? 'bg-accent text-accent-ink font-bold border-2 border-ink shadow-[2px_2px_0_0_var(--ink)] -translate-x-px -translate-y-px'
-                    : 'text-muted hover:text-ink hover:bg-bg/50'
+                    : 'text-muted hover:text-ink hover:bg-bg/50 border border-transparent'
                 )}
               >
                 {displayText}

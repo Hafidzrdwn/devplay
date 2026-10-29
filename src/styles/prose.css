@@ -31,9 +31,7 @@
   position: relative;
 }
 
-.prose-devplay .nb-card h2,
-.prose-devplay .nb-card h3,
-.prose-devplay .nb-card p {
+.prose-devplay :where(.nb-card) :where(h2, h3, p) {
   margin-top: 0;
   margin-bottom: 0;
 }

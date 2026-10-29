@@ -28,7 +28,7 @@ for (const entry of allDocs) {
   }
 }
 
-const officialConcepts = concepts.filter((concept) => concept.id <= 50);
+const officialConcepts = concepts;
 
 const difficultyDotColors: Record<Difficulty, string> = {
   easy: 'bg-success',
@@ -37,7 +37,7 @@ const difficultyDotColors: Record<Difficulty, string> = {
 };
 ---
 
-<nav aria-label={t('nav.docs')} class:list={['space-y-3', className]} data-pagefind-ignore>
+<nav aria-label={t('nav.docs')} class:list={['space-y-3 pt-1 pb-10 pr-2', className]} data-pagefind-ignore>
   {
     categories.map((cat) => {
       const categoryConcepts = officialConcepts.filter(
